@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/binary-for-ryu/static/css/main.73440117.css",
-    "main.js": "/binary-for-ryu/static/js/main.f912b5b6.js",
+    "main.css": "/binary-for-ryu/static/css/main.d61fe717.css",
+    "main.js": "/binary-for-ryu/static/js/main.27624cca.js",
     "index.html": "/binary-for-ryu/index.html",
-    "main.73440117.css.map": "/binary-for-ryu/static/css/main.73440117.css.map",
-    "main.f912b5b6.js.map": "/binary-for-ryu/static/js/main.f912b5b6.js.map"
+    "main.d61fe717.css.map": "/binary-for-ryu/static/css/main.d61fe717.css.map",
+    "main.27624cca.js.map": "/binary-for-ryu/static/js/main.27624cca.js.map"
   },
   "entrypoints": [
-    "static/css/main.73440117.css",
-    "static/js/main.f912b5b6.js"
+    "static/css/main.d61fe717.css",
+    "static/js/main.27624cca.js"
   ]
 }
