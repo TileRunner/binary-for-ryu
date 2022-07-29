@@ -14,3 +14,29 @@
 .Login h1 {
   padding-bottom: 15px;
 }
+.GetGameMode {
+  background-color: darkgreen;
+  color: lightgreen;
+  padding-left: 5px;
+}
+.GetGameMode h1 {
+  padding-bottom: 15px;
+}
+
+.PlaySolo {
+  background-color: brown;
+  color: burlywood;
+  padding-left: 5px;
+}
+
+.PlayClassic {
+  background-color: crimson;
+  color: chartreuse;
+  padding-left: 5px;
+}
+
+.PlaySurvival {
+  background-color: darkred;
+  color: whitesmoke;
+  padding-left: 30px;
+}
