@@ -34,8 +34,6 @@ function App() {
            setGameMode={setGameMode}
           />}
           {loggedIn && gameMode === 'SOLO' && <PlaySolo
-           username={username}
-           password={password}
           />}
           {loggedIn && gameMode === 'CLASSIC' && <PlayClassic
            username={username}
