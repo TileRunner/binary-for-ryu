@@ -12,7 +12,6 @@ function App() {
    */
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   /**
    * Game mode selection
    */
@@ -26,8 +25,6 @@ function App() {
            setLoggedIn={setLoggedIn}
            username={username}
            setUsername={setUsername}
-           password={password}
-           setPassword={setPassword}
           />
           {loggedIn && <GetGameMode
            gameMode={gameMode}
@@ -37,11 +34,9 @@ function App() {
           />}
           {loggedIn && gameMode === 'CLASSIC' && <PlayClassic
            username={username}
-           password={password}
           />}
           {loggedIn && gameMode === 'SURVIVAL' && <PlaySurvival
            username={username}
-           password={password}
           />}
       </header>
     </div>

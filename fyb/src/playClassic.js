@@ -1,8 +1,8 @@
-const PlayClassic = ({username, password}) => {
+const PlayClassic = ({username}) => {
     return <div className="PlayClassic">
         <h1>Classic Game</h1>
         <p>Classic game is not built yet</p>
-        <p>Info: {username}, {password}</p>
+        <p>Name: {username}</p>
     </div>;
 }
 

@@ -316,5 +316,6 @@
 .PlaySurvival {
   background-color: darkred;
   color: whitesmoke;
-  padding-left: 30px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
