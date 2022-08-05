@@ -314,8 +314,8 @@
 }
 
 .PlaySurvival {
-  background-color: darkred;
-  color: whitesmoke;
+  background-color: lightgray;
+  color: darkblue;
   padding-left: 5px;
   padding-right: 5px;
   width: fit-content;

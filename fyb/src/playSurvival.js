@@ -3,9 +3,9 @@ import Button from "react-bootstrap/Button";
 import Table from 'react-bootstrap/Table';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Form from 'react-bootstrap/Form';
 import { isWordValid } from "./wordFunctions";
-const baseurl = 'https://enigmatic-lake-42795.herokuapp.com';
+import InputWord from "./inputWord";
+const baseurl = 'https://enigmatic-lake-42795.herokuapp.com'; //'http://localhost:5000'; 
 
 const PlaySurvival = ({username}) => {
     const [infoMsg, setInfoMessage] = useState('Loading...');
@@ -167,9 +167,28 @@ const PlaySurvival = ({username}) => {
             setInfoMessage(`${username} made a move`);
         }
     }
-    function isValidFormat(s) {
-        let alphabeticPattern = /^[A-Za-z]+$/;
-        return alphabeticPattern.test(s);
+    async function playAgain() {
+        let url = `${baseurl}/fyb/playagain?number=${gamedata.number}`;
+        const response = await fetch(url);
+        const jdata = await response.json();
+        if (jdata.error) {
+            setInfoMessage(jdata.error);
+        } else {
+            setGamedata(jdata);
+            setInfoMessage(`${username} restarted the game`);
+        }
+    }
+    function movetext(round, player) {
+        if (!round.moves.length) {return 'N/A';}
+        let foundmoves = round.moves.filter(move => {return move.name === player.name;});
+        if (foundmoves.length) {
+            let foundmove = foundmoves[0];
+            if (!gamedata.finished) { return foundmove.type; }
+            if (foundmove.type === 'PASS') { return 'PASS';}
+            if (foundmove.type === 'PHONY') { return `Phony: ${foundmove.word.toLowerCase()}`;}
+            if (foundmove.type === 'VALID') { return `Valid: ${foundmove.word.toUpperCase()}`;}
+        }
+        return 'n/a';
     }
     const ShowGame = <div>
         <Row>
@@ -187,41 +206,75 @@ const PlaySurvival = ({username}) => {
             <Col>Round: {gamedata.round}</Col>
             <Col>Fry Letters: {gamedata.letters.slice(0,2+gamedata.round).join("").toUpperCase()}</Col>
             {meToMove() && <Col>
-            <Form onSubmit={handleSubmit}>
-                <Form.Label>Your Word:</Form.Label>
-                <Form.Control
-                type="text"
-                value={myword}
-                onChange={e => { setMyword(e.target.value); } }
-                isInvalid={myword && !isValidFormat(myword)}
+                <InputWord
+                myword={myword}
+                setMyword={setMyword}
+                handleSubmit={handleSubmit}
                 />
-                <Form.Control.Feedback type="invalid">Must only use letters</Form.Control.Feedback>
-            </Form>
             </Col>
             }
         </Row>
         }
-        <Row>
-            {gamedata.players && gamedata.players.map((player,index) => (
-                <Col key={`player${player.name}`}>
-                    {player.name}
-                    {gamedata.started ?
-                        player.alive ?
-                            player.tomove ?
-                                <span> To move...</span>
+        {gamedata.started && <Table>
+            <thead>
+                <tr>
+                    <th>Round</th>
+                    <th>Letters</th>
+                    {gamedata.players.map((player) => (
+                        <th key={`headerplayer${player.name}`}>
+                            {player.name}
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {gamedata.rounds.map((round,index) => (
+                <tr key={`roundindex${index}`}>
+                    <td>{index+1}</td>
+                    <td>{gamedata.letters.slice(0,index+3)}</td>
+                    {gamedata.players.map((player) => (
+                        <td key={`${player.name}`}>
+                            {movetext(round,player)}
+                        </td>
+                    ))}
+                </tr>
+                ))}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    {gamedata.players.map((player) => (
+                        <td key={`dataplayer${player.name}`}>
+                            {gamedata.started ?
+                                player.alive ?
+                                    player.tomove ?
+                                        <span> To move...</span>
+                                    :
+                                        <span> Survived!</span>
+                                :
+                                    <span> Eliminated!</span>
                             :
-                                <span> Survived!</span>
-                        :
-                            <span> Eliminated!</span>
-                    :
-                        <span>...</span>
-                    }
-                </Col>
-            ))}
+                                <span>...</span>
+                            }
+                        </td>
+                    ))}
+                </tr>
+            </tbody>
+        </Table>}
+        <Row>
+            <Col>
+                <Button onClick={() => {refreshGamedata();}}>
+                    Refresh Game Data
+                </Button>
+            </Col>
+            {gamedata.started && gamedata.finished &&
+            <Col>
+                <span>Game Over! </span>
+                <Button onClick={() => {playAgain();}}>
+                    Play Again
+                </Button>
+            </Col>
+            }
         </Row>
-        <Button onClick={() => {refreshGamedata();}}>
-            Refresh Game Data
-        </Button>
     </div>
     return <div className="PlaySurvival">
         <h1>Survival Game</h1>
