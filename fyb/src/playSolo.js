@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { isWordValid } from './wordFunctions';
-const baseurl = 'https://enigmatic-lake-42795.herokuapp.com';
+import { isWordValid, prepickFryLetters, getPossibleAnswers } from "./callApi";
 
 const PlaySolo = () => {
     const [pickedLetters, setPickedLetters] = useState([]); // All pre-picked fry letters as an array
@@ -16,20 +15,15 @@ const PlaySolo = () => {
     },[]);
 
     const pickAllFryLetters = async () => {
-        let url = `${baseurl}/ENABLE2K?prepickfry=true&guarantee=6`;
-        const response = await fetch(url);
-        const data = await response.json();
-        let picked = data.fryLetters.join('');
+        let picked = await prepickFryLetters();
         let newPick = Array.from(picked.toUpperCase());
         setPickedLetters(newPick);
         setFryLetters(newPick.slice(0,3));
     };
 
     async function getChefsPick() {
-        let url = `${baseurl}/ENABLE2K?topfry=true&letters=${fryLetters.join('')}&count=1`;
-        const response = await fetch(url);
-        const jdata = await response.json();
-        return jdata.answers && jdata.answers.length > 0 ? jdata.answers[0] : '';
+        let answers = await getPossibleAnswers(fryLetters, 1);
+        return answers && answers.length > 0 ? answers[0] : '';
     }
 
     const handleKeyDown = (event) => {
