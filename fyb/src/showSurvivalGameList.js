@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "react-bootstrap/Button";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -9,6 +9,7 @@ import { formatTime } from "./formatTime";
 const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatnumber}) => {
     const [infoMsg, setInfoMessage] = useState('Loading...');
     const [gamelist, setGamelist] = useState([]);
+    const hasFetchedData = useRef(false);
     useEffect(() => {
         async function fetchData() {
             let jdata = await callApi(`listgames?type=SURVIVAL`);
@@ -18,6 +19,10 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
                 setGamelist(jdata);
                 setInfoMessage(`List loaded at ${formatTime(Date.now())}`);
             }
+        }
+        if (!hasFetchedData.current) {
+            fetchData();
+            hasFetchedData.current = true;
         }
         const timer = setInterval(() => {
             fetchData();

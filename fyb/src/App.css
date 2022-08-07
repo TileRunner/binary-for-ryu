@@ -385,6 +385,7 @@
   font-size: xx-large;
   text-align: center;
   padding: 0px 2px;
+  text-transform: uppercase;
 }
 .fybFryLetter.Selected {
   color: blue;

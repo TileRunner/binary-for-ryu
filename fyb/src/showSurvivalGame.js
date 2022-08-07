@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import InputWord from "./inputWord";
 import { callApi, isWordValid } from "./callApi";
 import Row from "react-bootstrap/Row";
@@ -6,18 +6,24 @@ import Col from "react-bootstrap/Col";
 import Table from 'react-bootstrap/Table';
 import Button from "react-bootstrap/Button";
 import { formatTime } from "./formatTime";
+import ShowFryLetters from "./showFryLetters";
+import { usePrevious } from "./usePrevious";
 
 const ShowSurvivalGame = ({gamenumber, username}) => {
-    // const hasFetchedData = useRef(false);
     const [infoMsg, setInfoMessage] = useState('Loading...');
     const [gamedata, setGamedata] = useState({});
     const [myword, setMyword] = useState('');
+    const [fryLetters, setFryLetters] = useState([]);
+    const [selected, setSelected] = useState(-1);
+    const prevGamedata = usePrevious(gamedata);
+    const hasFetchedData = useRef(false);
     async function startGame() {
         let jdata = await callApi(`startgame?number=${gamenumber}`);
         if (jdata.error) {
             setInfoMessage(jdata.error);
         } else {
             setGamedata(jdata);
+            setFryLetters(jdata.letters.slice(0,jdata.round+2));
             setInfoMessage('Game started');
         }
     }
@@ -30,8 +36,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             }
         }
     }
-    async function handleSubmit(event) {
-        event.preventDefault();
+    async function handleSubmit() {
         let route = `makemove?number=${gamenumber}&name=${username}`;
         if (myword) {
             let valid = await isWordValid(myword);
@@ -48,6 +53,8 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             setInfoMessage(jdata.error);
         } else {
             setGamedata(jdata);
+            setFryLetters(jdata.letters.slice(0,jdata.round+2));
+            selected(-1);
             setInfoMessage(`${username} made a move`);
         }
     }
@@ -57,6 +64,8 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             setInfoMessage(jdata.error);
         } else {
             setGamedata(jdata);
+            setFryLetters(jdata.letters.slice(0,jdata.round+2));
+            setSelected(-1);
             setInfoMessage(`${username} restarted the game`);
         }
     }
@@ -77,21 +86,25 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             // If I call refreshGamedata, which has this same code, compiler complains about refreshGamedata not being a dependancy
             let jdata = await callApi(`getgame?number=${gamenumber}`);
             if (jdata.error) {
+                console.log(`fetch error at ${formatTime(Date.now())}: ${jdata.error}`);
                 setInfoMessage(jdata.error);
             } else {
+                if (jdata.started && (!prevGamedata || prevGamedata.round !== jdata.round)) {
+                    setFryLetters(jdata.letters.slice(0,jdata.round+2));
+                    setSelected(-1);
+                }
                 setGamedata(jdata);
                 setInfoMessage(`Game loaded at ${formatTime(Date.now())}`);
             }
+        }
+        if (!hasFetchedData.current) {
+            fetchData();
+            hasFetchedData.current = true;
         }
         const timer = setInterval(() => {
             fetchData();
           },10000); // every 10 seconds
         return () => clearInterval(timer);
-        // if (!hasFetchedData.current) {
-        //     fetchData();
-        //     hasFetchedData.current = true;
-        // }
-    // },[gamenumber]);
     });
     return (<div>
         <p>Info: {infoMsg}</p>
@@ -107,13 +120,16 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
         }
         {gamedata.started &&
         <Row>
-            <Col>Round: {gamedata.round}</Col>
-            <Col>Fry Letters: {gamedata.letters.slice(0,2+gamedata.round).join("").toUpperCase()}</Col>
+            <Col xs={2}>Round: {gamedata.round}</Col>
+            <Col xs={6}>
+                <ShowFryLetters fryLetters={fryLetters} selected={selected} setFryLetters={setFryLetters} setSelected={setSelected}/>
+            </Col>
             {meToMove() && <Col>
                 <InputWord
                 myword={myword}
                 setMyword={setMyword}
                 handleSubmit={handleSubmit}
+                fryLetters={fryLetters}
                 />
             </Col>
             }

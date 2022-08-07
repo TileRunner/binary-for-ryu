@@ -50,14 +50,10 @@ const ShowChat = ({chatnumber, username}) => {
         <div id="ScrollableChat" className="thinChat">
           <table>
             <tbody>
-              {msgs.map((value, index) => (<>
-                <tr key={`ChatMessageFrom${index}`}>
+              {msgs.map((value, index) => (<tr key={`ChatMessageFrom${index}`}>
                   <td className="thinChatFrom">{value.name}</td>
-                </tr>
-                <tr key={`ChatMessageMsg${index}`}>
                   <td className="thinChatMsg">{value.msg}</td>
-                </tr>
-                </>))}
+                </tr>))}
               <tr>
                 <td colSpan="2">
                   {username === "" ?
