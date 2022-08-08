@@ -15,7 +15,7 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
             let jdata = await callApi(`listgames?type=SURVIVAL`);
             if (jdata.error) {
                 setInfoMessage(jdata.error);
-            } else {
+            } else if (JSON.stringify(jdata) !== JSON.stringify(gamelist)) {
                 setGamelist(jdata);
                 setInfoMessage(`List loaded at ${formatTime(Date.now())}`);
             }

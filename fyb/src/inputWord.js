@@ -6,6 +6,7 @@ const InputWord = ({myword, setMyword, handleSubmit, fryLetters}) => {
     }
     function hasFryLetters() {
         let fixedword = myword.toLowerCase().trim();
+        if (!fixedword) {return;}
         // Check if they have all the fry letters
         for (let i = 0; i < fryLetters.length; i++) {
             let letterCountRequired = 0;

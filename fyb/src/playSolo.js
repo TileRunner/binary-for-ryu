@@ -6,7 +6,6 @@ const PlaySolo = () => {
     const [pickedLetters, setPickedLetters] = useState([]); // All pre-picked fry letters as an array
     const [fryLetters, setFryLetters] = useState([]); // Fry letters shown at current stage as an array
     const [word, setWord] = useState('');
-    const [selected, setSelected] = useState(-1); // Used for letting the user move fry letters around
     const [moves, setMoves] = useState([]);
     const [warning, setWarning] = useState('Practice session.');
     const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
@@ -136,7 +135,7 @@ const PlaySolo = () => {
             <div>Prepicked fry letters: {pickedLetters}</div>
             {fryLetters.length > 0 &&
             <div>
-                <ShowFryLetters fryLetters={fryLetters} selected={selected} setFryLetters={setFryLetters} setSelected={setSelected}/>
+                <ShowFryLetters originalLetters={fryLetters}/>
                 <div onKeyDownCapture={handleKeyDown}>
                     <div className="trEmphasis">Enter Word:</div>
                     <input

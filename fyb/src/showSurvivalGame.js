@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import InputWord from "./inputWord";
-import { callApi, isWordValid } from "./callApi";
+import { callApi, getPossibleAnswers, isWordValid } from "./callApi";
+import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from 'react-bootstrap/Table';
@@ -13,17 +14,15 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
     const [infoMsg, setInfoMessage] = useState('Loading...');
     const [gamedata, setGamedata] = useState({});
     const [myword, setMyword] = useState('');
-    const [fryLetters, setFryLetters] = useState([]);
-    const [selected, setSelected] = useState(-1);
-    const prevGamedata = usePrevious(gamedata);
+    const [topAnswers, setTopAnswers] = useState([]);
     const hasFetchedData = useRef(false);
+    const prevGamedata = usePrevious(gamedata);
     async function startGame() {
         let jdata = await callApi(`startgame?number=${gamenumber}`);
         if (jdata.error) {
             setInfoMessage(jdata.error);
         } else {
             setGamedata(jdata);
-            setFryLetters(jdata.letters.slice(0,jdata.round+2));
             setInfoMessage('Game started');
         }
     }
@@ -53,8 +52,6 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             setInfoMessage(jdata.error);
         } else {
             setGamedata(jdata);
-            setFryLetters(jdata.letters.slice(0,jdata.round+2));
-            selected(-1);
             setInfoMessage(`${username} made a move`);
         }
     }
@@ -64,8 +61,6 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             setInfoMessage(jdata.error);
         } else {
             setGamedata(jdata);
-            setFryLetters(jdata.letters.slice(0,jdata.round+2));
-            setSelected(-1);
             setInfoMessage(`${username} restarted the game`);
         }
     }
@@ -86,13 +81,8 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             // If I call refreshGamedata, which has this same code, compiler complains about refreshGamedata not being a dependancy
             let jdata = await callApi(`getgame?number=${gamenumber}`);
             if (jdata.error) {
-                console.log(`fetch error at ${formatTime(Date.now())}: ${jdata.error}`);
                 setInfoMessage(jdata.error);
-            } else {
-                if (jdata.started && (!prevGamedata || prevGamedata.round !== jdata.round)) {
-                    setFryLetters(jdata.letters.slice(0,jdata.round+2));
-                    setSelected(-1);
-                }
+            } else if (JSON.stringify(jdata) !== JSON.stringify(gamedata)) {
                 setGamedata(jdata);
                 setInfoMessage(`Game loaded at ${formatTime(Date.now())}`);
             }
@@ -106,6 +96,15 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
           },10000); // every 10 seconds
         return () => clearInterval(timer);
     });
+    useEffect(() => {
+        async function fetchTopAnswers() {
+            let toppicks = await getPossibleAnswers(gamedata.letters.slice(0,gamedata.round+2), 10);
+            setTopAnswers(toppicks);
+        }
+        if ((!prevGamedata || !prevGamedata.finished) && gamedata.finished) {
+            fetchTopAnswers();
+        }
+    },[gamedata, prevGamedata]);
     return (<div>
         <p>Info: {infoMsg}</p>
         <Row>
@@ -122,14 +121,14 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
         <Row>
             <Col xs={2}>Round: {gamedata.round}</Col>
             <Col xs={6}>
-                <ShowFryLetters fryLetters={fryLetters} selected={selected} setFryLetters={setFryLetters} setSelected={setSelected}/>
+                <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
             </Col>
             {meToMove() && <Col>
                 <InputWord
                 myword={myword}
                 setMyword={setMyword}
                 handleSubmit={handleSubmit}
-                fryLetters={fryLetters}
+                fryLetters={gamedata.letters.slice(0,gamedata.round+2)}
                 />
             </Col>
             }
@@ -185,16 +184,21 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             <Col key={player.name}>{player.name}</Col>
         ))}
         </Row>}
-        <Row>
-            {gamedata.started && gamedata.finished &&
-            <Col>
-                <span>Game Over! </span>
-                <Button onClick={() => {playAgain();}}>
-                    Play Again
-                </Button>
-            </Col>
-            }
-        </Row>
+        {gamedata.started && gamedata.finished && <Container fluid>
+            <Row>
+                <Col>
+                    <span className="trEmphasis">Top 10: {topAnswers.join(", ")}</span>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <span>Game Over! </span>
+                    <Button onClick={() => {playAgain();}}>
+                        Play Again
+                    </Button>
+                </Col>
+            </Row>
+        </Container> }
     </div>
     );
 }

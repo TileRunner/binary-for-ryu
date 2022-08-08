@@ -1,5 +1,18 @@
+import { useState, useEffect } from "react";
+import { usePrevious } from "./usePrevious";
 
-const ShowFryLetters = ({fryLetters, selected, setFryLetters, setSelected}) => 
+const ShowFryLetters = ({originalLetters}) => {
+    const [fryLetters, setFryLetters] = useState([]);
+    const [selected, setSelected] = useState(-1);
+    const prevLetters = usePrevious(originalLetters);
+
+    useEffect(() => {
+        if (!prevLetters || prevLetters.join('') !== originalLetters.join('')) {
+            setFryLetters(originalLetters);
+            setSelected(-1);
+        }
+    },[originalLetters, prevLetters]);
+    return (
     <div className="fryLetterDiv">
         {fryLetters.map((fl, i) => (
             <span key={`SoloFryLetter${i}`}
@@ -58,7 +71,7 @@ const ShowFryLetters = ({fryLetters, selected, setFryLetters, setSelected}) =>
         } }>
             <i className="material-icons fryLetterActionButtonIcon">sort_by_alpha</i>
         </button>
-    </div>
-
+    </div>);
+}
 
 export default ShowFryLetters;
