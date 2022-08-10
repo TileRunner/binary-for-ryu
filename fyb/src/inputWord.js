@@ -1,5 +1,13 @@
 import Form from 'react-bootstrap/Form';
-const InputWord = ({myword, setMyword, handleSubmit, fryLetters}) => {
+import InputGroup from 'react-bootstrap/InputGroup';
+import Button from 'react-bootstrap/Button';
+
+import { useState, useEffect } from 'react';
+const InputWord = ({handleSubmit, fryLetters, myprevword}) => {
+    const [myword, setMyword] = useState('');
+    useEffect(() => {
+        setMyword('');
+    },[fryLetters]);
     function isAlphabetic() {
         let alphabeticPattern = /^[A-Za-z]+$/;
         return alphabeticPattern.test(myword);
@@ -34,20 +42,28 @@ const InputWord = ({myword, setMyword, handleSubmit, fryLetters}) => {
         if (err) {
             alert(err);
         } else {
-            handleSubmit();
+            handleSubmit(myword);
         }
+    }
+    function mypass() {
+        handleSubmit(''); // empty signifies pass
     }
     return (
     <Form onSubmit={mysubmit}>
-        <Form.Label>Your Word:</Form.Label>
-        <Form.Control
-        type="text"
-        value={myword}
-        onChange={e => { setMyword(e.target.value); } }
-        isInvalid={myword && !isAlphabetic()}
-        minLength={fryLetters.length}
-        />
-        <Form.Control.Feedback type="invalid">Must only use letters</Form.Control.Feedback>
+        <InputGroup>
+            {myprevword && <Button variant="outline-secondary" onClick={() => {setMyword(myprevword)}}>Copy</Button>}
+            <Form.Control
+            type="text"
+            value={myword}
+            onChange={e => { setMyword(e.target.value); } }
+            isInvalid={myword && !isAlphabetic()}
+            minLength={fryLetters.length}
+            placeholder="Your word..."
+            />
+            <Form.Control.Feedback type="invalid">Must only use letters</Form.Control.Feedback>
+            <Button variant="outline-secondary" onClick={() => {setMyword('')}}>Clear</Button>
+            <Button variant="outline-secondary" onClick={() => {mypass()}}>Pass</Button>
+        </InputGroup>
     </Form>
     );
 }

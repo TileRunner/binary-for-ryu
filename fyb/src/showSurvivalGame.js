@@ -12,7 +12,6 @@ import { usePrevious } from "./usePrevious";
 const ShowSurvivalGame = ({gamenumber, username}) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [gamedata, setGamedata] = useState({});
-    const [myword, setMyword] = useState('');
     const [topAnswers, setTopAnswers] = useState([]);
     const hasFetchedData = useRef(false);
     const prevGamedata = usePrevious(gamedata);
@@ -34,7 +33,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             }
         }
     }
-    async function handleSubmit() {
+    async function handleSubmit(myword) {
         let route = `makemove?number=${gamenumber}&name=${username}`;
         if (myword) {
             let valid = await isWordValid(myword);
@@ -74,6 +73,14 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             if (foundmove.type === 'VALID') { return `Valid: ${foundmove.word.toUpperCase()}`;}
         }
         return 'n/a';
+    }
+    function getmyprevword(roundindex, player) {
+        if (roundindex === 0) {return '';}
+        let foundmoves = gamedata.rounds[roundindex-1].moves.filter(move => {return move.name === player.name;});
+        if (foundmoves.length) {
+            return foundmoves[0].word;
+        }
+        return '';
     }
     useEffect(() => {
         async function fetchData() {
@@ -115,24 +122,8 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             Start Game
         </Button>
         }
-        {gamedata.started && <Container fluid>
-            <Row>
-                <Col xs={2}>Letters:</Col>
-                <Col>
-                    <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
-                </Col>
-            </Row>
-            {meToMove() && <Row>
-                <Col>
-                    <InputWord
-                    myword={myword}
-                    setMyword={setMyword}
-                    handleSubmit={handleSubmit}
-                    fryLetters={gamedata.letters.slice(0,gamedata.round+2)}
-                    />
-                </Col>
-            </Row>}
-        </Container>
+        {gamedata.started &&
+            <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
         }
         {gamedata.started && <Table size="sm">
             <thead>
@@ -153,7 +144,15 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
                     <td>{gamedata.letters.slice(0,index+3)}</td>
                     {gamedata.players && gamedata.players.length && gamedata.players.map((player) => (
                         <td key={`${player.name}`}>
-                            {movetext(round,player)}
+                            {index === gamedata.rounds.length - 1 && player.name === username && meToMove() ?
+                                <InputWord
+                                handleSubmit={handleSubmit}
+                                fryLetters={gamedata.letters.slice(0,gamedata.round+2)}
+                                myprevword={getmyprevword(index,player)}
+                                />
+                            :
+                                <span>{movetext(round,player)}</span>
+                            }
                         </td>
                     ))}
                 </tr>

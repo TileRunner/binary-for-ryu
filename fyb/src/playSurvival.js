@@ -10,7 +10,6 @@ const PlaySurvival = ({username}) => {
     const [gamechatnumber, setGamechatnumber] = useState(-1);
 
     return <div className="PlaySurvival">
-        <h1>Survival Game</h1>
         {inlobby ?
             <Table>
                 <thead>

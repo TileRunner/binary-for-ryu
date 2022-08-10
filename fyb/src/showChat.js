@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { callApi } from "./callApi";
 import { scrollToBottom } from "./scrollToBottom";
-// import { usePrevious } from "./usePrevious";
+import { usePrevious } from "./usePrevious";
 
 const ShowChat = ({chatnumber, username}) => {
-    // const prevChatnumber = usePrevious(chatnumber);
     const [msgs, setMsgs] = useState([]);
     const [nextmsg, setNextmsg] = useState('');
+    const hasFetchedData = useRef(false);
+    const prevChatNumber = usePrevious(chatnumber);
+
     useEffect(() => {
         async function fetchData() {
             let jdata = await callApi(`getchat?number=${chatnumber}`);
@@ -14,16 +16,16 @@ const ShowChat = ({chatnumber, username}) => {
                 setMsgs(jdata.msgs);
             }
         }
+        if (!hasFetchedData.current || chatnumber !== prevChatNumber) {
+          fetchData();
+          hasFetchedData.current = true;
+        }
         const timer = setInterval(() => {
           fetchData();
         },10000); // every 10 seconds
         return () => clearInterval(timer);
 
-        // if (!prevChatnumber || prevChatnumber !== chatnumber) {
-        //     fetchData();
-        // }
-    // },[chatnumber,prevChatnumber]);
-    });
+    },[chatnumber,prevChatNumber]);
 
     useEffect(() => {
         scrollToBottom("ScrollableChat");
