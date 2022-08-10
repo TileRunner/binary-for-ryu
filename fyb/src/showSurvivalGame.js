@@ -6,12 +6,11 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from 'react-bootstrap/Table';
 import Button from "react-bootstrap/Button";
-import { formatTime } from "./formatTime";
 import ShowFryLetters from "./showFryLetters";
 import { usePrevious } from "./usePrevious";
 
 const ShowSurvivalGame = ({gamenumber, username}) => {
-    const [infoMsg, setInfoMessage] = useState('Loading...');
+    const [errorMessage, setErrorMessage] = useState('');
     const [gamedata, setGamedata] = useState({});
     const [myword, setMyword] = useState('');
     const [topAnswers, setTopAnswers] = useState([]);
@@ -20,10 +19,10 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
     async function startGame() {
         let jdata = await callApi(`startgame?number=${gamenumber}`);
         if (jdata.error) {
-            setInfoMessage(jdata.error);
+            setErrorMessage(jdata.error);
         } else {
             setGamedata(jdata);
-            setInfoMessage('Game started');
+            setErrorMessage('');
         }
     }
     function meToMove() {
@@ -49,19 +48,19 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
         }
         let jdata = await callApi(route);
         if (jdata.error) {
-            setInfoMessage(jdata.error);
+            setErrorMessage(jdata.error);
         } else {
             setGamedata(jdata);
-            setInfoMessage(`${username} made a move`);
+            setErrorMessage('');
         }
     }
     async function playAgain() {
         let jdata = await callApi(`playagain?number=${gamenumber}`);
         if (jdata.error) {
-            setInfoMessage(jdata.error);
+            setErrorMessage(jdata.error);
         } else {
             setGamedata(jdata);
-            setInfoMessage(`${username} restarted the game`);
+            setErrorMessage('');
         }
     }
     function movetext(round, player) {
@@ -81,10 +80,10 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             // If I call refreshGamedata, which has this same code, compiler complains about refreshGamedata not being a dependancy
             let jdata = await callApi(`getgame?number=${gamenumber}`);
             if (jdata.error) {
-                setInfoMessage(jdata.error);
+                setErrorMessage(jdata.error);
             } else if (JSON.stringify(jdata) !== JSON.stringify(gamedata)) {
                 setGamedata(jdata);
-                setInfoMessage(`Game loaded at ${formatTime(Date.now())}`);
+                setErrorMessage('');
             }
         }
         if (!hasFetchedData.current) {
@@ -106,33 +105,34 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
         }
     },[gamedata, prevGamedata]);
     return (<div>
-        <p>Info: {infoMsg}</p>
+        {errorMessage && <p className="trWarning">Error: {errorMessage}</p>}
         <Row>
             <Col>Game Number: {gamedata.number}</Col>
-            <Col>Creator: {gamedata.creator}</Col>
-            <Col>Created: {formatTime(gamedata.createTime)}</Col>
+            <Col>Round: {gamedata.round}</Col>
         </Row>
         {!gamedata.started &&
         <Button onClick={() => {startGame();}}>
             Start Game
         </Button>
         }
-        {gamedata.started &&
-        <Row>
-            <Col xs={2}>Round: {gamedata.round}</Col>
-            <Col xs={6}>
-                <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
-            </Col>
-            {meToMove() && <Col>
-                <InputWord
-                myword={myword}
-                setMyword={setMyword}
-                handleSubmit={handleSubmit}
-                fryLetters={gamedata.letters.slice(0,gamedata.round+2)}
-                />
-            </Col>
-            }
-        </Row>
+        {gamedata.started && <Container fluid>
+            <Row>
+                <Col xs={2}>Letters:</Col>
+                <Col>
+                    <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
+                </Col>
+            </Row>
+            {meToMove() && <Row>
+                <Col>
+                    <InputWord
+                    myword={myword}
+                    setMyword={setMyword}
+                    handleSubmit={handleSubmit}
+                    fryLetters={gamedata.letters.slice(0,gamedata.round+2)}
+                    />
+                </Col>
+            </Row>}
+        </Container>
         }
         {gamedata.started && <Table size="sm">
             <thead>

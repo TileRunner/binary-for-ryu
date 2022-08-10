@@ -7,20 +7,22 @@ import { callApi } from "./callApi";
 import { formatTime } from "./formatTime";
 
 const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatnumber}) => {
-    const [infoMsg, setInfoMessage] = useState('Loading...');
+    const [errorMessage, setErrorMessage] = useState('Loading...');
     const [gamelist, setGamelist] = useState([]);
     const hasFetchedData = useRef(false);
     useEffect(() => {
         async function fetchData() {
             let jdata = await callApi(`listgames?type=SURVIVAL`);
             if (jdata.error) {
-                setInfoMessage(jdata.error);
-            } else if (JSON.stringify(jdata) !== JSON.stringify(gamelist)) {
-                setGamelist(jdata);
-                setInfoMessage(`List loaded at ${formatTime(Date.now())}`);
+                setErrorMessage(jdata.error);
+            } else {
+                if (JSON.stringify(jdata) !== JSON.stringify(gamelist)) {
+                    setGamelist(jdata);
+                }
+                setErrorMessage('');
             }
         }
-        if (!hasFetchedData.current) {
+        if (!hasFetchedData.current) {            
             fetchData();
             hasFetchedData.current = true;
         }
@@ -32,7 +34,7 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
     async function createNewGame() {
         let jdata = await callApi(`creategame?type=SURVIVAL&name=${username}`);
         if (jdata.error) {
-            setInfoMessage(jdata.error);
+            setErrorMessage(jdata.error);
         } else {
             setGamenumber(jdata.number);
             setGamechatnumber(jdata.chatNumber);
@@ -42,7 +44,7 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
     async function joinGame(joingamenumber) {
         let jdata = await callApi(`joingame?number=${joingamenumber}&name=${username}`);
         if (jdata.error) {
-            setInfoMessage(jdata.error);
+            setErrorMessage(jdata.error);
         } else {
             setGamenumber(jdata.number);
             setGamechatnumber(jdata.chatNumber);
@@ -50,7 +52,7 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
         }
     }
     return (<div>
-        <p>Info: {infoMsg}</p>
+        {errorMessage && <p className="trWarning">Error: {errorMessage}</p>}
         <p>Number of games: {gamelist.length}</p>
         <Table striped bordered hover size="sm" variant="dark" responsive="sm">
             <thead>
