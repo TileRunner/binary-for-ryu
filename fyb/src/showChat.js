@@ -4,6 +4,7 @@ import { scrollToBottom } from "./scrollToBottom";
 import { usePrevious } from "./usePrevious";
 
 const ShowChat = ({chatnumber, username}) => {
+    const [errorMessage, setErrorMessage] = useState('');
     const [msgs, setMsgs] = useState([]);
     const [nextmsg, setNextmsg] = useState('');
     const hasFetchedData = useRef(false);
@@ -12,8 +13,10 @@ const ShowChat = ({chatnumber, username}) => {
     useEffect(() => {
         async function fetchData() {
             let jdata = await callApi(`getchat?number=${chatnumber}`);
-            if (jdata.msgs) {
-                setMsgs(jdata.msgs);
+            if (jdata.error) {
+              setErrorMessage(jdata.error);
+            } else {
+              setMsgs(jdata.msgs);
             }
         }
         if (!hasFetchedData.current || chatnumber !== prevChatNumber) {
@@ -50,6 +53,7 @@ const ShowChat = ({chatnumber, username}) => {
     
       return (
         <div id="ScrollableChat" className="thinChat">
+          {errorMessage && <p className="trWarning">Error: {errorMessage}</p>}
           <table>
             <tbody>
               {msgs.map((value, index) => (<tr key={`ChatMessageFrom${index}`}>

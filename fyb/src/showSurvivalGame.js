@@ -12,6 +12,7 @@ import { usePrevious } from "./usePrevious";
 const ShowSurvivalGame = ({gamenumber, username}) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [gamedata, setGamedata] = useState({});
+    const [myword, setMyword] = useState('');
     const [topAnswers, setTopAnswers] = useState([]);
     const hasFetchedData = useRef(false);
     const prevGamedata = usePrevious(gamedata);
@@ -149,6 +150,8 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
                                 handleSubmit={handleSubmit}
                                 fryLetters={gamedata.letters.slice(0,gamedata.round+2)}
                                 myprevword={getmyprevword(index,player)}
+                                myword={myword}
+                                setMyword={setMyword}
                                 />
                             :
                                 <span>{movetext(round,player)}</span>

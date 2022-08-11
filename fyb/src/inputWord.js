@@ -1,20 +1,22 @@
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
-
-import { useState, useEffect } from 'react';
-const InputWord = ({handleSubmit, fryLetters, myprevword}) => {
-    const [myword, setMyword] = useState('');
+import { usePrevious } from './usePrevious';
+import { useEffect } from 'react';
+const InputWord = ({handleSubmit, fryLetters, myprevword, myword, setMyword}) => {
+    const prevFryLetters = usePrevious(fryLetters);
     useEffect(() => {
-        setMyword('');
-    },[fryLetters]);
+        if (JSON.stringify(fryLetters) !== JSON.stringify(prevFryLetters)) {
+            setMyword('');
+        }
+    },[fryLetters,prevFryLetters,setMyword]);
     function isAlphabetic() {
         let alphabeticPattern = /^[A-Za-z]+$/;
         return alphabeticPattern.test(myword);
     }
     function hasFryLetters() {
         let fixedword = myword.toLowerCase().trim();
-        if (!fixedword) {return;}
+        if (!fixedword) {return "Please use the Pass button to pass, or enter a word";}
         // Check if they have all the fry letters
         for (let i = 0; i < fryLetters.length; i++) {
             let letterCountRequired = 0;
@@ -52,6 +54,7 @@ const InputWord = ({handleSubmit, fryLetters, myprevword}) => {
     <Form onSubmit={mysubmit}>
         <InputGroup>
             {myprevword && <Button variant="outline-secondary" onClick={() => {setMyword(myprevword)}}>Copy</Button>}
+            <Button variant="outline-secondary" onClick={() => {setMyword('')}}>Clear</Button>
             <Form.Control
             type="text"
             value={myword}
@@ -61,8 +64,8 @@ const InputWord = ({handleSubmit, fryLetters, myprevword}) => {
             placeholder="Your word..."
             />
             <Form.Control.Feedback type="invalid">Must only use letters</Form.Control.Feedback>
-            <Button variant="outline-secondary" onClick={() => {setMyword('')}}>Clear</Button>
             <Button variant="outline-secondary" onClick={() => {mypass()}}>Pass</Button>
+            <Button variant="primary" type='submit'>Submit</Button>
         </InputGroup>
     </Form>
     );
