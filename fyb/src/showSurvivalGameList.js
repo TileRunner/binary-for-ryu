@@ -7,7 +7,7 @@ import { callApi } from "./callApi";
 import { formatTime } from "./formatTime";
 
 const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatnumber}) => {
-    const [errorMessage, setErrorMessage] = useState('Loading...');
+    const [errorMessage, setErrorMessage] = useState('');
     const [gamelist, setGamelist] = useState([]);
     const hasFetchedData = useRef(false);
     useEffect(() => {
