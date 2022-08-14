@@ -29,7 +29,7 @@ const PlaySurvival = ({username}) => {
             <Table>
                 <thead>
                     <tr>
-                        <th>Game</th>
+                        <th>Game Number {gamenumber}</th>
                         <th>Chat</th>
                     </tr>
                 </thead>

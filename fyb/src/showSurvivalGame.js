@@ -6,6 +6,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from 'react-bootstrap/Table';
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 import ShowFryLetters from "./showFryLetters";
 import { usePrevious } from "./usePrevious";
 
@@ -113,18 +114,24 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
         }
     },[gamedata, prevGamedata]);
     return (<div>
-        {errorMessage && <p className="trWarning">Error: {errorMessage}</p>}
-        <Row>
-            <Col>Game Number: {gamedata.number}</Col>
-            <Col>Round: {gamedata.round}</Col>
-        </Row>
+        {errorMessage && <Alert variant="warning">Error: {errorMessage}</Alert>}
+        {gamedata.started && <Row>
+            <Col xs='auto'>
+                <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
+            </Col>
+            {!gamedata.finished && <Col>
+                When prompted, enter a word containing at least these letters.
+            </Col>}
+            {gamedata.finished && <Col xs='auto'>
+                <Button onClick={() => {playAgain();}}>
+                    Play Again
+                </Button>
+            </Col>}
+        </Row>}
         {!gamedata.started &&
         <Button onClick={() => {startGame();}}>
             Start Game
         </Button>
-        }
-        {gamedata.started &&
-            <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
         }
         {gamedata.started && <Table size="sm">
             <thead>
@@ -165,39 +172,36 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
                     <td></td>
                     {gamedata.players && gamedata.players.length && gamedata.players.map((player) => (
                         <td key={`dataplayer${player.name}`}>
-                            {gamedata.started ?
-                                player.alive ?
-                                    player.tomove ?
-                                        <span> To move...</span>
-                                    :
-                                        <span> Survived!</span>
+                            {player.alive ?
+                                player.tomove ?
+                                    <span> To move...</span>
                                 :
-                                    <span> Eliminated!</span>
+                                    <span> Survived!</span>
                             :
-                                <span>...</span>
+                                <span> Eliminated!</span>
                             }
                         </td>
                     ))}
                 </tr>
             </tbody>
         </Table>}
+        {gamedata.started && !gamedata.finished && <Row><Col xs='auto'><Alert variant='info'>Prepicked: {gamedata.letters}</Alert></Col></Row>}
         {!gamedata.started && gamedata.players && gamedata.players.length && <Row>
         {gamedata.players.map((player) => (
             <Col key={player.name}>{player.name}</Col>
         ))}
         </Row>}
         {gamedata.started && gamedata.finished && <Container fluid>
-            <Row>
-                <Col>
-                    <span className="trEmphasis">Top 10: {topAnswers.join(", ")}</span>
+            {gamedata.round + 2 === gamedata.letters.length
+             && gamedata.players.filter(p => {return p.alive;}).length > 0
+             && <Row>
+                <Col xs='auto'>
+                    <Alert variant="success">Wow! You survived all the possible letters!</Alert>
                 </Col>
-            </Row>
+            </Row>}
             <Row>
-                <Col>
-                    <span>Game Over! </span>
-                    <Button onClick={() => {playAgain();}}>
-                        Play Again
-                    </Button>
+                <Col xs='auto'>
+                    <Alert variant="info">Top 10: {topAnswers.join(", ")}</Alert>
                 </Col>
             </Row>
         </Container> }

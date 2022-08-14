@@ -111,10 +111,15 @@ const ShowClassicGame = ({gamenumber, username}) => {
             <Col xs='auto'>
                 <ShowFryLetters originalLetters={gamedata.rounds[gamedata.round-1].letters}/>
             </Col>
-            <Col>
+            {!gamedata.finished && <Col>
                 When prompted, enter a word containing at least these letters.
                 {gamedata.freeforall && <span> Shortest answers get the points.</span>}
-            </Col>
+            </Col>}
+            {gamedata.finished && <Col xs='auto'>
+                <Button onClick={() => {playAgain();}}>
+                    Play Again
+                </Button>
+            </Col>}
         </Row>}
         {!gamedata.started &&
         <Button onClick={() => {startGame();}}>
@@ -166,6 +171,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
                 </tr>}
             </tbody>
         </Table>}
+        {gamedata.started && !gamedata.finished && <Row><Col xs='auto'><Alert variant='info'>Prepicked: {gamedata.letters}</Alert></Col></Row>}
         {!gamedata.started && gamedata.players && gamedata.players.length && <Row>
         {gamedata.players.map((player) => (
             <Col key={player.name}>{player.name}</Col>
@@ -182,14 +188,6 @@ const ShowClassicGame = ({gamenumber, username}) => {
             <Row>
                 <Col xs='auto'>
                     <Alert variant='info'>Top 10: {topAnswers.join(", ")}</Alert>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <span>Game Over! </span>
-                    <Button onClick={() => {playAgain();}}>
-                        Play Again
-                    </Button>
                 </Col>
             </Row>
         </Container> }
