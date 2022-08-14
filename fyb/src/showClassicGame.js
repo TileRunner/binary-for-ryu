@@ -76,14 +76,6 @@ const ShowClassicGame = ({gamenumber, username}) => {
         }
         return 'n/a';
     }
-    function getmyprevword(roundindex, player) {
-        if (roundindex === 0) {return '';}
-        let foundmoves = gamedata.rounds[roundindex-1].moves.filter(move => {return move.name === player.name;});
-        if (foundmoves.length) {
-            return foundmoves[0].word;
-        }
-        return '';
-    }
     useEffect(() => {
         async function fetchData() {
             // If I call refreshGamedata, which has this same code, compiler complains about refreshGamedata not being a dependancy
@@ -101,7 +93,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
         }
         const timer = setInterval(() => {
             fetchData();
-          },10000); // every 10 seconds
+          },5000); // every 5 seconds
         return () => clearInterval(timer);
     });
     useEffect(() => {
@@ -115,17 +107,19 @@ const ShowClassicGame = ({gamenumber, username}) => {
     },[gamedata, prevGamedata]);
     return (<div>
         {errorMessage && <Alert variant="warning">Error: {errorMessage}</Alert>}
-        <Row>
-            <Col>Game Number: {gamedata.number}</Col>
-            <Col>Round: {gamedata.round}</Col>
-        </Row>
+        {gamedata.started && <Row>
+            <Col xs='auto'>
+                <ShowFryLetters originalLetters={gamedata.rounds[gamedata.round-1].letters}/>
+            </Col>
+            <Col>
+                When prompted, enter a word containing at least these letters.
+                {gamedata.freeforall && <span> Shortest answers get the points.</span>}
+            </Col>
+        </Row>}
         {!gamedata.started &&
         <Button onClick={() => {startGame();}}>
             Start Game
         </Button>
-        }
-        {gamedata.started &&
-            <ShowFryLetters originalLetters={gamedata.rounds[gamedata.round-1].letters}/>
         }
         {gamedata.started && <Table size="sm">
             <thead>
@@ -150,7 +144,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
                                 <InputWord
                                 handleSubmit={handleSubmit}
                                 fryLetters={round.letters}
-                                myprevword={getmyprevword(index,player)}
+                                myprevword=''
                                 myword={myword}
                                 setMyword={setMyword}
                                 />
