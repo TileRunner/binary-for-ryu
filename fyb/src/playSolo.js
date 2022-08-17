@@ -98,7 +98,7 @@ const PlaySolo = () => {
             <div className="trOptionsDiv">
                 <div className={validOnly ? "trCheckbox On" : "trCheckbox Off"}
                  onClick={() => {setValidOnly(!validOnly);}}
-                 data-toggle="tooltip" title="Whether guess must be valid words"
+                 data-toggle="tooltip" title="Whether guesses must be valid words"
                  >
                     <label key='labelvalidonly'>Guesses must be valid words</label>
                 </div>

@@ -10,6 +10,7 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
     const [errorMessage, setErrorMessage] = useState('');
     const [gamelist, setGamelist] = useState([]);
     const hasFetchedData = useRef(false);
+    const [validOnly, setValidOnly] = useState(false);
     useEffect(() => {
         async function fetchData() {
             let jdata = await callApi(`listgames?type=CLASSIC`);
@@ -28,11 +29,11 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
         }
         const timer = setInterval(() => {
             fetchData();
-        },10000); // every 10 seconds
+        },3000); // every 3 seconds
         return () => clearInterval(timer);
     });
     async function createNewGame() {
-        let jdata = await callApi(`creategame?type=CLASSIC&name=${username}`);
+        let jdata = await callApi(`creategame?type=CLASSIC&name=${username}&validOnly=${validOnly}`);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
@@ -84,10 +85,20 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
             </tbody>
         </Table>
         <Row>
-            <Col>
+            <Col xs='auto'>
                 <Button onClick={() => {createNewGame();}}>
                     Create Game
                 </Button>
+            </Col>
+            <Col xs='auto'>
+                <div className="trOptionsDiv">
+                    <div className={validOnly ? "trCheckbox On" : "trCheckbox Off"}
+                    onClick={() => {setValidOnly(!validOnly);}}
+                    data-toggle="tooltip" title="When selected, players get to try again for invalid words"
+                    >
+                        <label key='labelvalidonly'>Mulligans</label>
+                    </div>
+                </div>
             </Col>
         </Row>
     </div>

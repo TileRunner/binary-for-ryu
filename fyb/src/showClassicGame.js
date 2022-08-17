@@ -42,6 +42,10 @@ const ShowClassicGame = ({gamenumber, username}) => {
             if (valid) {
                 route = `${route}&type=VALID&word=${myword}`;
             } else {
+                if (gamedata.validOnly) {
+                    setErrorMessage(`${myword} is not allowed, please try again`);
+                    return;
+                }
                 route = `${route}&type=PHONY&word=${myword}`;
             }   
         } else {
@@ -93,7 +97,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
         }
         const timer = setInterval(() => {
             fetchData();
-          },5000); // every 5 seconds
+          },3000); // every 3 seconds
         return () => clearInterval(timer);
     });
     useEffect(() => {

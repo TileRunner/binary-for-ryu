@@ -25,7 +25,7 @@ const ShowChat = ({chatnumber, username}) => {
         }
         const timer = setInterval(() => {
           fetchData();
-        },10000); // every 10 seconds
+        },3000); // every 3 seconds
         return () => clearInterval(timer);
 
     },[chatnumber,prevChatNumber]);

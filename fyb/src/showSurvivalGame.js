@@ -42,6 +42,10 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             if (valid) {
                 route = `${route}&type=VALID&word=${myword}`;
             } else {
+                if (gamedata.validOnly) {
+                    setErrorMessage(`${myword} is not allowed, please try again`);
+                    return;
+                }
                 route = `${route}&type=PHONY&word=${myword}`;
             }   
         } else {
@@ -101,7 +105,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
         }
         const timer = setInterval(() => {
             fetchData();
-          },10000); // every 10 seconds
+          },3000); // every 3 seconds
         return () => clearInterval(timer);
     });
     useEffect(() => {

@@ -293,18 +293,30 @@
 .Login {
   background-color: darkblue;
   color: aqua;
+  margin-left: 5vw;
+  width: 90vw;
   padding-left: 5px;
 }
 .Login h1 {
   padding-bottom: 15px;
 }
+.Logout {
+  background-color: darkblue;
+  color: aqua;
+  width: fit-content;
+  padding-left: 5px;
+}
 .GetGameMode {
   background-color: darkgreen;
-  color: lightgreen;
+  color: whitesmoke;
+  width: fit-content;
   padding-left: 5px;
 }
 .GetGameMode h1 {
   padding-bottom: 15px;
+}
+.GetGameMode td {
+  color: whitesmoke;
 }
 
 .PlayClassic {

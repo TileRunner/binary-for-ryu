@@ -15,7 +15,7 @@ const Login = ({loggedIn, setLoggedIn, username, setUsername}) => {
         let alphanumericPattern = /^[ A-Za-z0-9]+$/;
         return alphanumericPattern.test(s);
     }
-    const UserLogout = <div className='Login'>
+    const UserLogout = <div className='Logout'>
         <Row>
             <Col xs="auto">
                 Username: {username}
