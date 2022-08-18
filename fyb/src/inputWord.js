@@ -27,7 +27,7 @@ const InputWord = ({handleSubmit, fryLetters, myprevword, myword, setMyword}) =>
                 }
             }
             for (let j = 0; j < fixedword.length; j++) {
-                if (fryLetters[i] === fixedword[j]) {
+                if (fryLetters[i].toLowerCase() === fixedword[j]) {
                     actualLetterCount = actualLetterCount + 1;
                 }
             }

@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { isWordValid, prepickFryLetters, getPossibleAnswers } from "./callApi";
 import ShowFryLetters from "./showFryLetters";
+import Table from "react-bootstrap/Table";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import InputWord from "./inputWord";
 
 const PlaySolo = () => {
     const [pickedLetters, setPickedLetters] = useState([]); // All pre-picked fry letters as an array
     const [fryLetters, setFryLetters] = useState([]); // Fry letters shown at current stage as an array
-    const [word, setWord] = useState('');
+    const [myword, setMyword] = useState('');
     const [moves, setMoves] = useState([]);
     const [warning, setWarning] = useState('Practice session.');
     const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
@@ -22,20 +26,18 @@ const PlaySolo = () => {
     };
 
     async function getChefsPick() {
-        let answers = await getPossibleAnswers(fryLetters, 1);
-        return answers && answers.length > 0 ? answers[0] : '';
+        let answers = await getPossibleAnswers(fryLetters, 10);
+        return answers.join(', ');
     }
 
-    const handleKeyDown = (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            submitPlayerWord();
+
+    async function submitPlayerWord (word) {
+        let fixedword = word.toUpperCase().trim();
+        if (fixedword === '') {
+            let move = {pass:true};
+            await finishMoveAndMoveOn(move);
             return;
         }
-    }
-
-    const submitPlayerWord = async() => {
-        let fixedword = word.toUpperCase().trim();
         // Check if they have all the fry letters
         for (let i = 0; i < fryLetters.length; i++) {
             let letterCountRequired = 0;
@@ -64,11 +66,6 @@ const PlaySolo = () => {
         await finishMoveAndMoveOn(move);
     }
 
-    const submitPass = async() => {
-        let move = {pass:true};
-        await finishMoveAndMoveOn(move);
-    }
-
     async function finishMoveAndMoveOn(move) {
         let chefsPick = await getChefsPick();
         move.fryLetters = fryLetters;
@@ -81,7 +78,7 @@ const PlaySolo = () => {
         setMoves(newmoves);
         if (fryLetters.length === pickedLetters.length) {
             await pickAllFryLetters();
-            setWord('');
+            setMyword('');
             setWarning('New fry letters picked.')
         } else {
             let newFryLetters = pickedLetters.slice(0, fryLetters.length + 1);
@@ -91,26 +88,23 @@ const PlaySolo = () => {
     }
 
     return (
-        <div className="trBackground">
-            <div className="trTitle">
-                Fry Your Brain Solo
-            </div>
+        <div className="PlaySolo">
             <div className="trOptionsDiv">
                 <div className={validOnly ? "trCheckbox On" : "trCheckbox Off"}
                  onClick={() => {setValidOnly(!validOnly);}}
-                 data-toggle="tooltip" title="Whether guesses must be valid words"
+                 data-toggle="tooltip" title="When selected, you get to try again for invalid words"
                  >
-                    <label key='labelvalidonly'>Guesses must be valid words</label>
+                    <label key='labelvalidonly'>Mulligans</label>
                 </div>
             </div>
             {moves.length >= 0 && <div>
-                <table className="trTable" border="1">
+                <Table borderered striped hover size="sm" variant="dark" responsive>
                     <thead>
                         <tr>
-                            <th>Fry Letters</th>
+                            <th>Letters</th>
                             <th>Play Made</th>
                             <th>Result</th>
-                            <th>Chefs Pick</th>
+                            <th>Top Answer(s)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,45 +116,28 @@ const PlaySolo = () => {
                                     {!m.pass && <>{m.word}</>}
                                 </td>
                                 <td>
-                                    {!m.pass && m.valid && m.word.length === m.chefsPick.length && <span className="trEmphasis">Shortest!</span>}
-                                    {!m.pass && m.valid && m.word.length > m.chefsPick.length && <>Valid</>}
+                                    {!m.pass && m.valid && m.word.length === m.chefsPick.split(',')[0].length && <span className="trEmphasis">Shortest!</span>}
+                                    {!m.pass && m.valid && m.word.length > m.chefsPick.split(',')[0].length && <>Valid</>}
                                     {!m.pass && !m.valid && <span className="trDanger">Phoney</span>}
                                 </td>
-                                <td>{m.chefsPick}</td>
+                                <td data-toggle='tooltip' title={m.chefsPick}>{m.pass || !m.valid ? m.chefsPick : m.chefsPick.split(',')[0]}</td>
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </Table>
             </div>}
-            <div>Prepicked fry letters: {pickedLetters}</div>
+            <div>Prepicked letters: {pickedLetters}</div>
             {fryLetters.length > 0 &&
-            <div>
-                <ShowFryLetters originalLetters={fryLetters}/>
-                <div onKeyDownCapture={handleKeyDown}>
-                    <div className="trEmphasis">Enter Word:</div>
-                    <input
-                        type="text" placeholder="Enter word here"
-                        autoComplete="off" spellCheck="false"
-                        name="word"
-                        value={word}
-                        onChange={(e) => {
-                            setWord(e.target.value);
-                        } } />
-                    <button className="closemebutton" onClick={() => {setWord('');}}/>
-                    <div>
-                        {word.toUpperCase().trim().match("^[a-zA-Z]*$") && 
-                            <button className="trButton" key="submitWord"
-                                onClick={() => {submitPlayerWord()}}>
-                                SUBMIT
-                            </button>
-                        }
-                        <button className="trButton" key="passButton"
-                            onClick={() => {submitPass()}}>
-                            PASS
-                        </button>
-                    </div>
-                </div>
-            </div>}
+            <Row>
+                <Col xs='auto'><ShowFryLetters originalLetters={fryLetters}/></Col>
+                <Col xs='auto'><InputWord
+                                handleSubmit={submitPlayerWord}
+                                fryLetters={fryLetters}
+                                myprevword={fryLetters.length > 3 && moves.length > 0 ? moves[moves.length-1].word : ''}
+                                myword={myword}
+                                setMyword={setMyword}
+                /></Col>
+            </Row>}
             {warning && <div className="trWarning">{warning}</div>}
         </div>
     );

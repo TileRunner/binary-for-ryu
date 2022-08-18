@@ -26,22 +26,24 @@ const Login = ({loggedIn, setLoggedIn, username, setUsername}) => {
         </Row>
     </div>;
     const UserLogin = <div className="Login">
-        <h1>Login</h1>
         <Form onSubmit={handleSubmit}>
-            <Form.Group as={Row} controlId="username" className="mb-3">
-                <Form.Label column sm={1}>Username:</Form.Label>
-                <Col sm={3}>
+            <Form.Group as={Row} controlId="username">
+                <Form.Label column sm={2}>Username:</Form.Label>
+                <Col sm={7}>
                     <Form.Control
                         className="mb-3"
                         type="text"
                         value={username}
                         onChange={e => { setUsername(e.target.value); } }
                         isInvalid={username && !isValidFormat(username)} />
-                    <Form.Control.Feedback type="invalid">Must only use letters and/or numbers and/or spaces</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid" className='trWarning'>Must only use letters and/or numbers and/or spaces</Form.Control.Feedback>
+                </Col>
+                <Col sm={1}>
+                    <Button variant="primary" disabled={!isDataAcceptable()} type="submit">Submit</Button>
                 </Col>
             </Form.Group>
-            <Button variant="primary" disabled={!isDataAcceptable()} type="submit">Submit</Button>
         </Form>
+        <p className='trEmphasis'>Username distinguishes players in multi-player games. No passwords.</p>
     </div>;
     return (
         loggedIn ? UserLogout : UserLogin

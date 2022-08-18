@@ -26,11 +26,12 @@ function App() {
            username={username}
            setUsername={setUsername}
           />
-          {loggedIn && <GetGameMode
+          <GetGameMode
+           loggedIn={loggedIn}
            gameMode={gameMode}
            setGameMode={setGameMode}
-          />}
-          {loggedIn && gameMode === 'SOLO' && <PlaySolo
+          />
+          {gameMode === 'SOLO' && <PlaySolo
           />}
           {loggedIn && gameMode === 'CLASSIC' && <PlayClassic
            username={username}

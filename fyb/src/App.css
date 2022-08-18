@@ -288,21 +288,18 @@
   flex-direction: column;
   background-color: black;
   color: aliceblue;
+  background-image: url('../public/tileCS.ico');
 }
 
 .Login {
-  background-color: darkblue;
-  color: aqua;
-  margin-left: 5vw;
-  width: 90vw;
+  background-color: darkgreen;
+  color: whitesmoke;
+  width: 30vw;
   padding-left: 5px;
 }
-.Login h1 {
-  padding-bottom: 15px;
-}
 .Logout {
-  background-color: darkblue;
-  color: aqua;
+  background-color: darkgreen;
+  color: whitesmoke;
   width: fit-content;
   padding-left: 5px;
 }
@@ -317,6 +314,12 @@
 }
 .GetGameMode td {
   color: whitesmoke;
+}
+
+.PlaySolo {
+  background-color: lightgray;
+  color: darkblue;
+  padding-left: 5px;
 }
 
 .PlayClassic {
