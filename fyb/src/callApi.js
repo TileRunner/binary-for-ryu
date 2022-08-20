@@ -1,5 +1,11 @@
 const baseurl = (process.env.NODE_ENV === 'production' ? 'https://enigmatic-lake-42795.herokuapp.com' : 'http://localhost:5000');
 
+/**
+ * Call the game server.
+ * @param {string} route The part of the route that is specific to what the call is for
+ * @returns The api response json. If an error is trapped the json is {error: 'Problem with url'} where url is the full url used.
+ * @async
+ */
 export async function callApi(route) {
     let url = `${baseurl}/fyb/${route}`;
     try {
@@ -15,36 +21,12 @@ export async function callApi(route) {
 /**
  * Determine whether a word is in the slur-expunged ENABLE2K lexicon, case insensitive
  * @param {string} word A word
- * @returns Whether the word is in the ENABLE2K lexicon
+ * @returns Whether the word is in the lexicon
  * @async
  */
  export async function isWordValid(word) {
-    let url = `${baseurl}/ENABLE2K?exists=${word.toLowerCase()}`;
+    let url = `${baseurl}/ENABLE2K?exists=${word}`; // Server handles case insensitive logic
     const response = await fetch(url);
     const jdata = await response.json();
     return jdata.exists;
-}
-
-/** Pre pick all fry letters for a game
- * @returns A string of pre-picked fry letters.
- * @async
- */
-export async function prepickFryLetters() {
-    let url = `${baseurl}/ENABLE2K?prepickfry=true&guarantee=6`;
-    const response = await fetch(url);
-    const jdata = await response.json();
-    return jdata.fryLetters.join('');
-}
-
-/**
- * 
- * @param {Array[string]} fryLetters The fry letters that you want possible answers for
- * @param {number} count The number of possible answers to return
- * @returns {Array[string]} An array of possible answers
- */
-export async function getPossibleAnswers(fryLetters, count) {
-    let url = `${baseurl}/ENABLE2K?topfry=true&letters=${fryLetters.join('')}&count=${count}`;
-    const response = await fetch(url);
-    const jdata = await response.json();
-    return jdata.answers;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { isWordValid, prepickFryLetters, getPossibleAnswers } from "./callApi";
+import { isWordValid, callApi } from "./callApi";
 import ShowFryLetters from "./showFryLetters";
 import Table from "react-bootstrap/Table";
 import Row from "react-bootstrap/Row";
@@ -7,29 +7,39 @@ import Col from "react-bootstrap/Col";
 import InputWord from "./inputWord";
 
 const PlaySolo = () => {
-    const [pickedLetters, setPickedLetters] = useState([]); // All pre-picked fry letters as an array
-    const [fryLetters, setFryLetters] = useState([]); // Fry letters shown at current stage as an array
+    const [allLetters, setAllLetters] = useState([]); // All pre-picked letters as an array
+    const [currentLetters, setCurrentLetters] = useState([]); // Letters shown at current stage as an array
     const [myword, setMyword] = useState('');
     const [moves, setMoves] = useState([]);
     const [warning, setWarning] = useState('Practice session.');
     const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
 
     useEffect(() => {
-        pickAllFryLetters();
+        pickAllLetters();
     },[]);
 
-    const pickAllFryLetters = async () => {
-        let picked = await prepickFryLetters();
-        let newPick = Array.from(picked.toUpperCase());
-        setPickedLetters(newPick);
-        setFryLetters(newPick.slice(0,3));
+    const pickAllLetters = async () => {
+        let picked = await callApi('pickletters');
+        if (picked.error) {
+            setWarning(picked.error);
+            setAllLetters([]);
+            setCurrentLetters([]);
+        } else {
+            let newPick = Array.from(picked.letters.toUpperCase());
+            setAllLetters(newPick);
+            setCurrentLetters(newPick.slice(0,3));    
+        }
     };
 
-    async function getChefsPick() {
-        let answers = await getPossibleAnswers(fryLetters, 10);
-        return answers.join(', ');
+    async function getTopAnswers() {
+        let route = `gettopanswers?letters=${currentLetters.join('')}&count=10`;
+        let tops = await callApi(route);
+        if (tops.error) {
+            setWarning(tops.error);
+            return 'urp';
+        }
+        return tops.answers.join(', ');
     }
-
 
     async function submitPlayerWord (word) {
         let fixedword = word.toUpperCase().trim();
@@ -39,21 +49,21 @@ const PlaySolo = () => {
             return;
         }
         // Check if they have all the fry letters
-        for (let i = 0; i < fryLetters.length; i++) {
+        for (let i = 0; i < currentLetters.length; i++) {
             let letterCountRequired = 0;
             let actualLetterCount = 0;
-            for (let j = 0; j < fryLetters.length; j++) {
-                if (fryLetters[i] === fryLetters[j]) {
+            for (let j = 0; j < currentLetters.length; j++) {
+                if (currentLetters[i] === currentLetters[j]) {
                     letterCountRequired = letterCountRequired + 1;
                 }
             }
             for (let j = 0; j < fixedword.length; j++) {
-                if (fryLetters[i] === fixedword[j]) {
+                if (currentLetters[i] === fixedword[j]) {
                     actualLetterCount = actualLetterCount + 1;
                 }
             }
             if (actualLetterCount < letterCountRequired) {
-                setWarning(`You need the letter ${fryLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
+                setWarning(`You need the letter ${currentLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
                 return;
             }
         }
@@ -67,22 +77,22 @@ const PlaySolo = () => {
     }
 
     async function finishMoveAndMoveOn(move) {
-        let chefsPick = await getChefsPick();
-        move.fryLetters = fryLetters;
-        move.chefsPick = chefsPick;
+        let topAnswers = await getTopAnswers();
+        move.fryLetters = currentLetters;
+        move.topAnswers = topAnswers;
         let newmoves = [...moves];
         newmoves.push(move);
         while (newmoves.length > 15) {
             newmoves.splice(0,1);
         }
         setMoves(newmoves);
-        if (fryLetters.length === pickedLetters.length) {
-            await pickAllFryLetters();
+        if (currentLetters.length === allLetters.length) {
+            await pickAllLetters();
             setMyword('');
             setWarning('New fry letters picked.')
         } else {
-            let newFryLetters = pickedLetters.slice(0, fryLetters.length + 1);
-            setFryLetters(newFryLetters);
+            let newFryLetters = allLetters.slice(0, currentLetters.length + 1);
+            setCurrentLetters(newFryLetters);
             setWarning('');
         }
     }
@@ -116,24 +126,24 @@ const PlaySolo = () => {
                                     {!m.pass && <>{m.word}</>}
                                 </td>
                                 <td>
-                                    {!m.pass && m.valid && m.word.length === m.chefsPick.split(',')[0].length && <span className="trEmphasis">Shortest!</span>}
-                                    {!m.pass && m.valid && m.word.length > m.chefsPick.split(',')[0].length && <>Valid</>}
+                                    {!m.pass && m.valid && m.word.length === m.topAnswers.split(',')[0].length && <span className="trEmphasis">Shortest!</span>}
+                                    {!m.pass && m.valid && m.word.length > m.topAnswers.split(',')[0].length && <>Valid</>}
                                     {!m.pass && !m.valid && <span className="trDanger">Phoney</span>}
                                 </td>
-                                <td data-toggle='tooltip' title={m.chefsPick}>{m.pass || !m.valid ? m.chefsPick : m.chefsPick.split(',')[0]}</td>
+                                <td data-toggle='tooltip' title={m.topAnswers}>{m.pass || !m.valid ? m.topAnswers : m.topAnswers.split(',')[0]}</td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
             </div>}
-            <div>Prepicked letters: {pickedLetters}</div>
-            {fryLetters.length > 0 &&
+            <div>Prepicked letters: {allLetters}</div>
+            {currentLetters.length > 0 &&
             <Row>
-                <Col xs='auto'><ShowFryLetters originalLetters={fryLetters}/></Col>
+                <Col xs='auto'><ShowFryLetters originalLetters={currentLetters}/></Col>
                 <Col xs='auto'><InputWord
                                 handleSubmit={submitPlayerWord}
-                                fryLetters={fryLetters}
-                                myprevword={fryLetters.length > 3 && moves.length > 0 ? moves[moves.length-1].word : ''}
+                                fryLetters={currentLetters}
+                                myprevword={currentLetters.length > 3 && moves.length > 0 ? moves[moves.length-1].word : ''}
                                 myword={myword}
                                 setMyword={setMyword}
                 /></Col>

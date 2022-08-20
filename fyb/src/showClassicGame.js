@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import InputWord from "./inputWord";
-import { callApi, getPossibleAnswers, isWordValid } from "./callApi";
+import { callApi, isWordValid } from "./callApi";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -102,8 +102,14 @@ const ShowClassicGame = ({gamenumber, username}) => {
     });
     useEffect(() => {
         async function fetchTopAnswers() {
-            let toppicks = await getPossibleAnswers(gamedata.rounds[gamedata.rounds.length-1].letters, 10);
-            setTopAnswers(toppicks);
+            let route = `gettopanswers?letters=${gamedata.rounds[gamedata.rounds.length-1].letters.join('')}&count=10`;
+            let tops = await callApi(route);
+            if (tops.error) {
+                setErrorMessage(tops.error);
+                setTopAnswers(['urp']);
+            } else {
+                setTopAnswers(tops.answers);
+            }
         }
         if ((!prevGamedata || !prevGamedata.finished) && gamedata.finished) {
             fetchTopAnswers();
@@ -175,7 +181,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
                 </tr>}
             </tbody>
         </Table>}
-        {gamedata.started && !gamedata.finished && <Row><Col xs='auto'><Alert variant='info'>Prepicked: {gamedata.letters}</Alert></Col></Row>}
+        {gamedata.started && !gamedata.finished && <Row><Col xs='auto'><Alert variant='info'>Prepicked: {gamedata.letters.length} letters</Alert></Col></Row>}
         {!gamedata.started && gamedata.players && gamedata.players.length && <Row>
         {gamedata.players.map((player) => (
             <Col key={player.name}>{player.name}</Col>
