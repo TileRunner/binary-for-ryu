@@ -123,7 +123,7 @@ const PlaySolo = () => {
                 </div>
             </div>
             {moves.length >= 0 && <div>
-                <Table borderered striped hover size="sm" variant="dark" responsive>
+                <Table bordered striped hover size="sm" variant="dark" responsive>
                     <thead>
                         <tr>
                             <th>Letters</th>
@@ -157,7 +157,7 @@ const PlaySolo = () => {
                 <Col xs='auto'><ShowFryLetters originalLetters={currentLetters}/></Col>
                 <Col xs='auto'><InputWord
                                 handleSubmit={submitPlayerWord}
-                                fryLetters={currentLetters}
+                                letters={currentLetters}
                                 myprevword={currentLetters.length > 3 && moves.length > 0 ? moves[moves.length-1].word : ''}
                                 myword={myword}
                                 setMyword={setMyword}

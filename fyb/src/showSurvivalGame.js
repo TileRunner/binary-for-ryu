@@ -165,7 +165,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
                             {index === gamedata.rounds.length - 1 && player.name === username && meToMove() ?
                                 <InputWord
                                 handleSubmit={handleSubmit}
-                                fryLetters={gamedata.letters.slice(0,gamedata.round+2)}
+                                letters={gamedata.letters.slice(0,gamedata.round+2)}
                                 myprevword={getmyprevword(index,player)}
                                 myword={myword}
                                 setMyword={setMyword}

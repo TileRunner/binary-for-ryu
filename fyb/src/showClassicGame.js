@@ -158,7 +158,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
                             {index === gamedata.rounds.length - 1 && player.name === username && meToMove() ?
                                 <InputWord
                                 handleSubmit={handleSubmit}
-                                fryLetters={round.letters}
+                                letters={round.letters}
                                 myprevword=''
                                 myword={myword}
                                 setMyword={setMyword}
