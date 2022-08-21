@@ -11,7 +11,7 @@ const PlaySolo = () => {
     const [currentLetters, setCurrentLetters] = useState([]); // Letters shown at current stage as an array
     const [myword, setMyword] = useState('');
     const [moves, setMoves] = useState([]);
-    const [warning, setWarning] = useState('Practice session.');
+    const [warning, setWarning] = useState('Please wait while I feed the cat...');
     const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
     const [showTops, setShowTops] = useState(false); // whether to show top answers
     const [showPrepick, setShowPrepick] = useState(false); // whether to show pre-picked letters
@@ -27,6 +27,7 @@ const PlaySolo = () => {
             setAllLetters([]);
             setCurrentLetters([]);
         } else {
+            setWarning('');
             let newPick = Array.from(picked.letters.join('').toUpperCase());
             setAllLetters(newPick);
             setCurrentLetters(newPick.slice(0,3));    
