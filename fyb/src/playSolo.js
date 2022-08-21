@@ -13,6 +13,8 @@ const PlaySolo = () => {
     const [moves, setMoves] = useState([]);
     const [warning, setWarning] = useState('Practice session.');
     const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
+    const [showTops, setShowTops] = useState(false); // whether to show top answers
+    const [showPrepick, setShowPrepick] = useState(false); // whether to show pre-picked letters
 
     useEffect(() => {
         pickAllLetters();
@@ -25,7 +27,7 @@ const PlaySolo = () => {
             setAllLetters([]);
             setCurrentLetters([]);
         } else {
-            let newPick = Array.from(picked.letters.toUpperCase());
+            let newPick = Array.from(picked.letters.join('').toUpperCase());
             setAllLetters(newPick);
             setCurrentLetters(newPick.slice(0,3));    
         }
@@ -99,12 +101,24 @@ const PlaySolo = () => {
 
     return (
         <div className="PlaySolo">
-            <div className="trOptionsDiv">
-                <div className={validOnly ? "trCheckbox On" : "trCheckbox Off"}
+            <div className="trOptionsDiv floatleftdiv">
+                <div className={validOnly ? "trCheckbox On floatleft" : "trCheckbox Off floatleft"}
                  onClick={() => {setValidOnly(!validOnly);}}
                  data-toggle="tooltip" title="When selected, you get to try again for invalid words"
                  >
                     <label key='labelvalidonly'>Mulligans</label>
+                </div>
+                <div className={showTops ? "trCheckbox On floatleft" : "trCheckbox Off floatleft"}
+                 onClick={() => {setShowTops(!showTops);}}
+                 data-toggle="tooltip" title="Whether to show Top Answers table column"
+                 >
+                    <label key='labelvalidonly'>Show Top Answers</label>
+                </div>
+                <div className={showPrepick ? "trCheckbox On floatleft" : "trCheckbox Off floatleft"}
+                 onClick={() => {setShowPrepick(!showPrepick);}}
+                 data-toggle="tooltip" title="Whether to show pre-picked letters"
+                 >
+                    <label key='labelvalidonly'>Show Pre-picked Letters</label>
                 </div>
             </div>
             {moves.length >= 0 && <div>
@@ -114,7 +128,7 @@ const PlaySolo = () => {
                             <th>Letters</th>
                             <th>Play Made</th>
                             <th>Result</th>
-                            <th>Top Answer(s)</th>
+                            {showTops && <th>Top Answer(s)</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -130,13 +144,13 @@ const PlaySolo = () => {
                                     {!m.pass && m.valid && m.word.length > m.topAnswers.split(',')[0].length && <>Valid</>}
                                     {!m.pass && !m.valid && <span className="trDanger">Phoney</span>}
                                 </td>
-                                <td data-toggle='tooltip' title={m.topAnswers}>{m.pass || !m.valid ? m.topAnswers : m.topAnswers.split(',')[0]}</td>
+                                {showTops && <td data-toggle='tooltip' title={m.topAnswers}>{m.pass || !m.valid ? m.topAnswers : m.topAnswers.split(',')[0]}</td>}
                             </tr>
                         ))}
                     </tbody>
                 </Table>
             </div>}
-            <div>Prepicked letters: {allLetters}</div>
+            {showPrepick && <div>Prepicked letters: {allLetters}</div>}
             {currentLetters.length > 0 &&
             <Row>
                 <Col xs='auto'><ShowFryLetters originalLetters={currentLetters}/></Col>

@@ -20,12 +20,12 @@ function App() {
   return (
     <div>
       <header className="App">
-          <Login
+          {gameMode !== 'SOLO' && <Login
            loggedIn={loggedIn}
            setLoggedIn={setLoggedIn}
            username={username}
            setUsername={setUsername}
-          />
+          />}
           <GetGameMode
            loggedIn={loggedIn}
            gameMode={gameMode}

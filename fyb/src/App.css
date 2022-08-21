@@ -418,3 +418,12 @@
 .closemebutton::before {
   content: '\22A0'; /* X in a box */
 }
+.floatleftdiv {
+  display: table;
+  content: "";
+  clear: both;
+}
+.floatleft {
+  float: left;
+  padding-right: 15px;
+}
