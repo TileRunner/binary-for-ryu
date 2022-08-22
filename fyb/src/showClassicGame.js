@@ -75,10 +75,18 @@ const ShowClassicGame = ({gamenumber, username}) => {
             let foundmove = foundmoves[0];
             if (!gamedata.finished && player.name !== username) { return foundmove.type; }
             if (foundmove.type === 'PASS') { return 'PASS';}
-            if (foundmove.type === 'PHONY') { return `Phony: ${foundmove.word.toLowerCase()}`;}
-            if (foundmove.type === 'VALID') { return `Valid: ${foundmove.word.toUpperCase()}`;}
+            return foundmove.word.toUpperCase();
         }
         return 'n/a';
+    }
+    function moveclass(round, player) {
+        if (!round.moves.length) {return '';}
+        let foundmoves = round.moves.filter(move => {return move.name === player.name;});
+        if (foundmoves.length) {
+            let foundmove = foundmoves[0];
+            return `moveis${foundmove.type.toLowerCase()}`;
+        }
+        return '';
     }
     useEffect(() => {
         async function fetchData() {
@@ -88,6 +96,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
                 setErrorMessage(jdata.error);
             } else if (JSON.stringify(jdata) !== JSON.stringify(gamedata)) {
                 setGamedata(jdata);
+                console.log(JSON.stringify(jdata));
                 setErrorMessage('');
             }
         }
@@ -118,12 +127,8 @@ const ShowClassicGame = ({gamenumber, username}) => {
     return (<div>
         {errorMessage && <Alert variant="warning">Error: {errorMessage}</Alert>}
         {gamedata.started && <Row>
-            <Col xs='auto'>
-                <ShowFryLetters originalLetters={gamedata.rounds[gamedata.round-1].letters}/>
-            </Col>
-            {!gamedata.finished && <Col>
-                When prompted, enter a word containing at least these letters.
-                {gamedata.freeforall && <span> Shortest answers get the points.</span>}
+            {!gamedata.finished && gamedata.freeforall && <Col>
+                <Alert variant='info'>Free-for-all round. Shortest answers get the points.</Alert>
             </Col>}
             {gamedata.finished && <Col xs='auto'>
                 <Button onClick={() => {playAgain();}}>
@@ -155,32 +160,27 @@ const ShowClassicGame = ({gamenumber, username}) => {
                     <td>{round.letters}</td>
                     {gamedata.players && gamedata.players.length && gamedata.players.map((player) => (
                         <td key={`${player.name}`}>
-                            {index === gamedata.rounds.length - 1 && player.name === username && meToMove() ?
-                                <InputWord
-                                handleSubmit={handleSubmit}
-                                letters={round.letters}
-                                myprevword=''
-                                myword={myword}
-                                setMyword={setMyword}
-                                />
-                            :
-                                <span>{movetext(round,player)}</span>
-                            }
+                            <span className={moveclass(round,player)}>{movetext(round,player)}</span>
                         </td>
                     ))}
                 </tr>
                 ))}
-                {!gamedata.finished && <tr>
-                    <td></td>
-                    <td></td>
-                    {gamedata.players && gamedata.players.length && gamedata.players.map((player) => (
-                        <td key={`dataplayer${player.name}`}>
-                            {gamedata.started && player.alive && player.tomove && <span> To move...</span>}
-                        </td>
-                    ))}
-                </tr>}
             </tbody>
         </Table>}
+        {meToMove() && <Row>
+            <Col xs='auto'>
+                <ShowFryLetters originalLetters={gamedata.rounds[gamedata.round-1].letters}/>
+            </Col>
+            <Col xs='auto'>
+                <InputWord
+                                handleSubmit={handleSubmit}
+                                letters={gamedata.rounds[gamedata.round-1].letters}
+                                myprevword=''
+                                myword={myword}
+                                setMyword={setMyword}
+                                />
+            </Col>
+        </Row>}
         {gamedata.started && !gamedata.finished && <Row><Col xs='auto'><Alert variant='info'>Prepicked: {gamedata.letters.length} letters</Alert></Col></Row>}
         {!gamedata.started && gamedata.players && gamedata.players.length && <Row>
         {gamedata.players.map((player) => (
