@@ -2,13 +2,17 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import Modal from 'react-bootstrap/Modal';
 import { usePrevious } from './usePrevious';
 import { useEffect, useState } from 'react';
-const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword}) => {
+import { isWordValid } from "./callApi";
+const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mulligans}) => {
     const prevLetters = usePrevious(letters);
     const [showHelp, setShowHelp] = useState(false);
     const handleShowHelp = () => setShowHelp(true);
     const handleCloseHelp = () => setShowHelp(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const handleClearErrorMessage = () => setErrorMessage('');
 
     useEffect(() => {
         if (JSON.stringify(letters) !== JSON.stringify(prevLetters)) {
@@ -43,19 +47,43 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword}) => {
         return;
 
     }
-    function mysubmit(event) {
+    async function mysubmit(event) {
         event.preventDefault();
         let err = hasLetters();
         if (err) {
-            alert(err);
+            setErrorMessage(err);
         } else {
-            handleSubmit(myword);
+            let valid = await isWordValid(myword);
+            if (mulligans && !valid) {
+                setErrorMessage(`Sorry, ${myword} is not in my word list.`);
+                return;
+            }
+            handleSubmit(myword, valid);
         }
     }
     function mypass() {
-        handleSubmit(''); // empty signifies pass
+        handleSubmit('', false); // empty signifies pass
     }
-    return (
+    return (<div>
+    <Modal
+    show={errorMessage !== ''}
+    onHide={handleClearErrorMessage}
+    animation={false}
+    centered
+    backdrop='static'
+    >
+        <Modal.Header closeButton>
+            <Modal.Title>Attention</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            {errorMessage}
+        </Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={handleClearErrorMessage}>
+                Close
+            </Button>
+        </Modal.Footer>
+    </Modal>
     <Form onSubmit={mysubmit}>
         <InputGroup>
             {myprevword && <Button variant="outline-secondary" onClick={() => {setMyword(myprevword)}}>Copy</Button>}
@@ -83,7 +111,7 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword}) => {
             </Offcanvas>
         </InputGroup>
     </Form>
-    );
+    </div>);
 }
 
 export default InputWord;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { isWordValid, callApi } from "./callApi";
+import { callApi } from "./callApi";
 import ShowFryLetters from "./showFryLetters";
 import Table from "react-bootstrap/Table";
 import Row from "react-bootstrap/Row";
@@ -12,7 +12,7 @@ const PlaySolo = () => {
     const [myword, setMyword] = useState('');
     const [moves, setMoves] = useState([]);
     const [warning, setWarning] = useState('Please wait while I feed the cat...');
-    const [validOnly, setValidOnly] = useState(false); // whether guesses must be valid words
+    const [mulligans, setMulligans] = useState(false); // whether guesses must be valid words
     const [showTops, setShowTops] = useState(false); // whether to show top answers
     const [showPrepick, setShowPrepick] = useState(false); // whether to show pre-picked letters
 
@@ -44,38 +44,13 @@ const PlaySolo = () => {
         return tops.answers.join(', ');
     }
 
-    async function submitPlayerWord (word) {
+    async function submitPlayerWord (word, valid) {
         let fixedword = word.toUpperCase().trim();
-        if (fixedword === '') {
-            let move = {pass:true};
-            await finishMoveAndMoveOn(move);
-            return;
+        let move = {pass: fixedword === ''};
+        if (!move.pass) {
+            move.word = fixedword;
+            move.valid = valid;
         }
-        // Check if they have all the fry letters
-        for (let i = 0; i < currentLetters.length; i++) {
-            let letterCountRequired = 0;
-            let actualLetterCount = 0;
-            for (let j = 0; j < currentLetters.length; j++) {
-                if (currentLetters[i] === currentLetters[j]) {
-                    letterCountRequired = letterCountRequired + 1;
-                }
-            }
-            for (let j = 0; j < fixedword.length; j++) {
-                if (currentLetters[i] === fixedword[j]) {
-                    actualLetterCount = actualLetterCount + 1;
-                }
-            }
-            if (actualLetterCount < letterCountRequired) {
-                setWarning(`You need the letter ${currentLetters[i]} at least ${letterCountRequired} time${letterCountRequired === 1 ? '.' : 's.'}`);
-                return;
-            }
-        }
-        let valid = await isWordValid(word);
-        if (validOnly && !valid) {
-            alert(`Sorry, ${fixedword} is not in my word list.`);
-            return;
-        }
-        let move = {pass:false, word: word, valid: valid};
         await finishMoveAndMoveOn(move);
     }
 
@@ -103,8 +78,8 @@ const PlaySolo = () => {
     return (
         <div className="PlaySolo">
             <div className="trOptionsDiv floatleftdiv">
-                <div className={validOnly ? "trCheckbox On floatleft" : "trCheckbox Off floatleft"}
-                 onClick={() => {setValidOnly(!validOnly);}}
+                <div className={mulligans ? "trCheckbox On floatleft" : "trCheckbox Off floatleft"}
+                 onClick={() => {setMulligans(!mulligans);}}
                  data-toggle="tooltip" title="When selected, you get to try again for invalid words"
                  >
                     <label key='labelvalidonly'>Mulligans</label>
@@ -161,6 +136,7 @@ const PlaySolo = () => {
                                 myprevword={currentLetters.length > 3 && moves.length > 0 ? moves[moves.length-1].word : ''}
                                 myword={myword}
                                 setMyword={setMyword}
+                                mulligans={mulligans}
                 /></Col>
             </Row>}
             {warning && <div className="trWarning">{warning}</div>}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import InputWord from "./inputWord";
-import { callApi, isWordValid } from "./callApi";
+import { callApi } from "./callApi";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -35,17 +35,12 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             }
         }
     }
-    async function handleSubmit(myword) {
+    async function handleSubmit(myword, valid) {
         let route = `makemove?number=${gamenumber}&name=${username}`;
         if (myword) {
-            let valid = await isWordValid(myword);
             if (valid) {
                 route = `${route}&type=VALID&word=${myword}`;
             } else {
-                if (gamedata.validOnly) {
-                    setErrorMessage(`${myword} is not allowed, please try again`);
-                    return;
-                }
                 route = `${route}&type=PHONY&word=${myword}`;
             }   
         } else {
@@ -183,6 +178,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
                                 myprevword={getmyprevword()}
                                 myword={myword}
                                 setMyword={setMyword}
+                                mulligans={gamedata.validOnly}
                                 />
             </Col>
         </Row>}
