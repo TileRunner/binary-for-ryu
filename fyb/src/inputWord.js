@@ -6,19 +6,29 @@ import Modal from 'react-bootstrap/Modal';
 import { usePrevious } from './usePrevious';
 import { useEffect, useState } from 'react';
 import { isWordValid } from "./callApi";
-const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mulligans}) => {
+const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mulligans, timeLimit}) => {
     const prevLetters = usePrevious(letters);
     const [showHelp, setShowHelp] = useState(false);
     const handleShowHelp = () => setShowHelp(true);
     const handleCloseHelp = () => setShowHelp(false);
     const [errorMessage, setErrorMessage] = useState('');
     const handleClearErrorMessage = () => setErrorMessage('');
+    const [timeStart, setTimeStart] = useState(0);
+    const [timeRemaining, setTimeRemaining] = useState(60);
 
+    useEffect(() => {
+        const timer = setInterval(() => {
+            let secsLeft = Math.round((60000 - Date.now() + timeStart) / 1000);
+            setTimeRemaining( secsLeft < 0 ? 0 : secsLeft);
+          },1000); // every second
+        return () => clearInterval(timer);
+    },[timeStart]);
     useEffect(() => {
         if (JSON.stringify(letters) !== JSON.stringify(prevLetters)) {
             setMyword('');
+            setTimeStart(Date.now());
         }
-    },[letters,prevLetters,setMyword]);
+    },[letters,prevLetters,setMyword,timeLimit]);
     function isAlphabetic() {
         let alphabeticPattern = /^[A-Za-z]+$/;
         return alphabeticPattern.test(myword);
@@ -53,16 +63,20 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mullig
         if (err) {
             setErrorMessage(err);
         } else {
-            let valid = await isWordValid(myword);
-            if (mulligans && !valid) {
-                setErrorMessage(`Sorry, ${myword} is not in my word list.`);
+            let timedout = timeLimit && (timeRemaining === 0);
+            let valid = !timedout && await isWordValid(myword);
+            if (!timedout && mulligans && !valid) {
+                setErrorMessage(`Sorry, ${myword} is not in my word list. You can try again.`);
                 return;
             }
-            handleSubmit(myword, valid);
+            handleSubmit(myword, valid, timedout);
         }
     }
     function mypass() {
-        handleSubmit('', false); // empty signifies pass
+        handleSubmit('', false, false); // empty signifies pass
+    }
+    function handleTimeout() {
+        handleSubmit('', false, true); // timeout
     }
     return (<div>
     <Modal
@@ -84,6 +98,26 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mullig
             </Button>
         </Modal.Footer>
     </Modal>
+    <Modal
+    show={timeRemaining === 0}
+    onHide={handleTimeout}
+    centered
+    backdrop='static'
+    >
+        <Modal.Header closeButton>
+            <Modal.Title>
+                TIMEOUT!
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            You ran out of time!
+        </Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={handleTimeout}>
+                Close
+            </Button>
+        </Modal.Footer>
+    </Modal>
     <Form onSubmit={mysubmit}>
         <InputGroup>
             {myprevword && <Button variant="outline-secondary" onClick={() => {setMyword(myprevword)}}>Copy</Button>}
@@ -100,6 +134,8 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mullig
             <Button variant="outline-secondary" onClick={() => {mypass()}}>Pass</Button>
             <Button variant="primary" type='submit'>Submit</Button>
             <Button variant="info" onClick={handleShowHelp}>Help</Button>
+            {mulligans && <Form.Text><span>  Mulligans allowed</span></Form.Text>}
+            {timeLimit && <Form.Text>{mulligans && <span>,</span>} {timeRemaining} Seconds Remaining </Form.Text>}
             <Offcanvas show={showHelp} onHide={handleCloseHelp} placement='end'>
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Help</Offcanvas.Title>

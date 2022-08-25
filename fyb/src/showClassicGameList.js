@@ -34,7 +34,6 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
     });
     async function createNewGame() {
         let route = `creategame?type=CLASSIC&name=${username}&validOnly=${validOnly}`;
-        console.log(route);
         let jdata = await callApi(route);
         if (jdata.error) {
             setErrorMessage(jdata.error);

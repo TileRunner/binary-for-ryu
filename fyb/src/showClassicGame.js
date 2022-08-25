@@ -91,7 +91,6 @@ const ShowClassicGame = ({gamenumber, username}) => {
                 setErrorMessage(jdata.error);
             } else if (JSON.stringify(jdata) !== JSON.stringify(gamedata)) {
                 setGamedata(jdata);
-                console.log(JSON.stringify(jdata));
                 setErrorMessage('');
             }
         }
@@ -174,6 +173,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
                                 myword={myword}
                                 setMyword={setMyword}
                                 mulligans={gamedata.validOnly}
+                                timeLimit={gamedata.timeLimit}
                                 />
             </Col>
         </Row>}

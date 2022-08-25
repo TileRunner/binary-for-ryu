@@ -26,26 +26,26 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             setErrorMessage('');
         }
     }
-    function meToMove() {
-        if (!gamedata.started || gamedata.finished) {return false;}
-        for (let index = 0; index < gamedata.players.length; index++) {
-            const player = gamedata.players[index];
+    function meToMove(game) {
+        if (!game.started || game.finished) {return false;}
+        for (let index = 0; index < game.players.length; index++) {
+            const player = game.players[index];
             if (player.name === username) {
                 return player.tomove;
             }
         }
     }
-    async function handleSubmit(myword, valid) {
+    async function handleSubmit(myword, valid, timedout) {
         let route = `makemove?number=${gamenumber}&name=${username}`;
-        if (myword) {
-            if (valid) {
-                route = `${route}&type=VALID&word=${myword}`;
-            } else {
-                route = `${route}&type=PHONY&word=${myword}`;
-            }   
-        } else {
+        if (timedout) {
+            route = `${route}&type=TIMEOUT`;
+        } else if (!myword) {
             route = `${route}&type=PASS`
-        }
+        } else if (valid) {
+            route = `${route}&type=VALID&word=${myword}`;
+        } else {
+            route = `${route}&type=PHONY&word=${myword}`;
+        }   
         let jdata = await callApi(route);
         if (jdata.error) {
             setErrorMessage(jdata.error);
@@ -70,6 +70,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             let foundmove = foundmoves[0];
             if (!gamedata.finished && player.name !== username) { return foundmove.type; }
             if (foundmove.type === 'PASS') { return 'PASS';}
+            if (foundmove.type === 'TIMEOUT') { return 'TIMED OUT';}
             return foundmove.word.toUpperCase();
         }
         return 'n/a';
@@ -99,6 +100,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
             if (jdata.error) {
                 setErrorMessage(jdata.error);
             } else if (JSON.stringify(jdata) !== JSON.stringify(gamedata)) {
+                console.log(jdata);
                 setGamedata(jdata);
                 setErrorMessage('');
             }
@@ -126,7 +128,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
         if ((!prevGamedata || !prevGamedata.finished) && gamedata.finished) {
             fetchTopAnswers();
         }
-    },[gamedata, prevGamedata]);
+    },[gamedata, prevGamedata, username]);
     return (<div>
         {errorMessage && <Alert variant="warning">Error: {errorMessage}</Alert>}
         {gamedata.started && gamedata.finished && <Row>
@@ -167,7 +169,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
                 ))}
             </tbody>
         </Table>}
-        {meToMove() && <Row>
+        {meToMove(gamedata) && <Row>
             <Col xs='auto'>
                 <ShowFryLetters originalLetters={gamedata.letters.slice(0,gamedata.round+2)}/>
             </Col>
@@ -179,6 +181,7 @@ const ShowSurvivalGame = ({gamenumber, username}) => {
                                 myword={myword}
                                 setMyword={setMyword}
                                 mulligans={gamedata.validOnly}
+                                timeLimit={gamedata.timeLimit}
                                 />
             </Col>
         </Row>}
