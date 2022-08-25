@@ -6,6 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import { usePrevious } from './usePrevious';
 import { useEffect, useState } from 'react';
 import { isWordValid } from "./callApi";
+import Alert from 'react-bootstrap/Alert';
 const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mulligans, timeLimit}) => {
     const prevLetters = usePrevious(letters);
     const [showHelp, setShowHelp] = useState(false);
@@ -99,7 +100,7 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mullig
         </Modal.Footer>
     </Modal>
     <Modal
-    show={timeRemaining === 0}
+    show={timeLimit && (timeRemaining === 0)}
     onHide={handleTimeout}
     centered
     backdrop='static'
@@ -118,6 +119,15 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mullig
             </Button>
         </Modal.Footer>
     </Modal>
+    <Offcanvas show={showHelp} onHide={handleCloseHelp} placement='end'>
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Help</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    <p>Enter a word that has all the letters: {letters.join('').toUpperCase()}</p>
+                    <p>Use as many extra letters as you like.</p>
+                </Offcanvas.Body>
+    </Offcanvas>
     <Form onSubmit={mysubmit}>
         <InputGroup>
             {myprevword && <Button variant="outline-secondary" onClick={() => {setMyword(myprevword)}}>Copy</Button>}
@@ -134,19 +144,9 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mullig
             <Button variant="outline-secondary" onClick={() => {mypass()}}>Pass</Button>
             <Button variant="primary" type='submit'>Submit</Button>
             <Button variant="info" onClick={handleShowHelp}>Help</Button>
-            {mulligans && <Form.Text><span>  Mulligans allowed</span></Form.Text>}
-            {timeLimit && <Form.Text>{mulligans && <span>,</span>} {timeRemaining} Seconds Remaining </Form.Text>}
-            <Offcanvas show={showHelp} onHide={handleCloseHelp} placement='end'>
-                <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>Help</Offcanvas.Title>
-                </Offcanvas.Header>
-                <Offcanvas.Body>
-                    <p>Enter a word that has all the letters: {letters.join('').toUpperCase()}</p>
-                    <p>Use as many extra letters as you like.</p>
-                </Offcanvas.Body>
-            </Offcanvas>
         </InputGroup>
     </Form>
+    {timeLimit && <Alert variant={timeRemaining < 16 ? 'danger' : timeRemaining < 30 ? 'warning' : 'dark'}>{timeRemaining} seconds remaining.</Alert>}
     </div>);
 }
 
