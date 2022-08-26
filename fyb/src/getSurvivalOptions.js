@@ -21,13 +21,13 @@ const GetSurvivalOptions = ({submitSurvivalOptions, cancelSurvivalOptions}) => {
                 <Form.Label as={'h1'}>Survival Options:</Form.Label>
                 <Form.Check
                 type='switch'
-                label='Mulligans. When selected, players get try again if a word is not recognized.'
+                label={<><span className='cb1'>Mulligans</span><span className='cb2'>When selected, players may try again if a word is not recognized.</span></>}
                 id='Mulligans'
                 onChange={handleChangeMulligans}
                 />
                 <Form.Check
                 type='switch'
-                label='Time Limit. When selected, players have one minute to make a move.'
+                label={<><span className='cb1'>Time Limit</span><span className='cb2'>When selected, players have one minute to make a move.</span></>}
                 id='TimeLimit'
                 onChange={handleChangeTimeLimit}
                 />

@@ -443,3 +443,14 @@
   background-color: orangered;
   color: whitesmoke;
 }
+.form-check {
+  color: black;
+  margin-bottom: 15px;
+}
+.cb1 {
+  font-weight: bold;
+}
+.cb2 {
+  font-style: italic;
+  margin-left: 5px;
+}
