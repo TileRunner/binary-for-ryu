@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-const GetSurvivalOptions = ({submitSurvivalOptions, cancelSurvivalOptions}) => {
+const GetClassicOptions = ({submitClassicOptions, cancelClassicOptions}) => {
     const [mulligans, setMulligans] = useState(false);
     const [timeLimit, setTimeLimit] = useState(false);
     const handleChangeMulligans = () => {
@@ -15,10 +15,10 @@ const GetSurvivalOptions = ({submitSurvivalOptions, cancelSurvivalOptions}) => {
     function mysubmit(event) {
         event.preventDefault();
         let options = {mulligans: mulligans, timeLimit: timeLimit};
-        submitSurvivalOptions(options);
+        submitClassicOptions(options);
     }
     return(<Form onSubmit={mysubmit}>
-                <Form.Label as={'h1'}>Survival Options:</Form.Label>
+                <Form.Label as={'h1'}>Classic Options</Form.Label>
                 <Form.Check
                 type='switch'
                 label='Mulligans. When selected, players get try again if a word is not recognized.'
@@ -36,7 +36,7 @@ const GetSurvivalOptions = ({submitSurvivalOptions, cancelSurvivalOptions}) => {
                         <Button
                         variant='danger'
                         type='button'
-                        onClick={cancelSurvivalOptions}
+                        onClick={cancelClassicOptions}
                         >
                             Cancel
                         </Button>
@@ -53,4 +53,4 @@ const GetSurvivalOptions = ({submitSurvivalOptions, cancelSurvivalOptions}) => {
     </Form>);
 }
 
-export default GetSurvivalOptions;
+export default GetClassicOptions;

@@ -6,9 +6,9 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from 'react-bootstrap/Table';
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 import ShowFryLetters from "./showFryLetters";
 import { usePrevious } from "./usePrevious";
-import Alert from "react-bootstrap/Alert";
 
 const ShowClassicGame = ({gamenumber, username}) => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -35,17 +35,17 @@ const ShowClassicGame = ({gamenumber, username}) => {
             }
         }
     }
-    async function handleSubmit(myword, valid) {
+    async function handleSubmit(myword, valid, timedout) {
         let route = `makemove?number=${gamenumber}&name=${username}`;
-        if (myword) {
-            if (valid) {
-                route = `${route}&type=VALID&word=${myword}`;
-            } else {
-                route = `${route}&type=PHONY&word=${myword}`;
-            }   
-        } else {
+        if (timedout) {
+            route = `${route}&type=TIMEOUT`;
+        } else if (!myword) {
             route = `${route}&type=PASS`
-        }
+        } else if (valid) {
+            route = `${route}&type=VALID&word=${myword}`;
+        } else {
+            route = `${route}&type=PHONY&word=${myword}`;
+        }   
         let jdata = await callApi(route);
         if (jdata.error) {
             setErrorMessage(jdata.error);
@@ -70,6 +70,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
             let foundmove = foundmoves[0];
             if (!gamedata.finished && player.name !== username) { return foundmove.type; }
             if (foundmove.type === 'PASS') { return 'PASS';}
+            if (foundmove.type === 'TIMEOUT') { return 'TIMED OUT';}
             return foundmove.word.toUpperCase();
         }
         return 'n/a';

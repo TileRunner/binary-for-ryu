@@ -5,12 +5,13 @@ import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import { callApi } from "./callApi";
 import { formatTime } from "./formatTime";
+import GetClassicOptions from "./getClassicOptions";
 
 const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnumber}) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [gamelist, setGamelist] = useState([]);
     const hasFetchedData = useRef(false);
-    const [validOnly, setValidOnly] = useState(false);
+    const [showOptions, setShowOptions] = useState(false);
     useEffect(() => {
         async function fetchData() {
             let jdata = await callApi(`listgames?type=CLASSIC`);
@@ -32,9 +33,8 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
         },3000); // every 3 seconds
         return () => clearInterval(timer);
     });
-    async function createNewGame() {
-        let route = `creategame?type=CLASSIC&name=${username}&validOnly=${validOnly}`;
-        let jdata = await callApi(route);
+    async function createNewGame(options) {
+        let jdata = await callApi(`creategame?type=CLASSIC&name=${username}&validOnly=${options.mulligans}&timeLimit=${options.timeLimit}`);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
@@ -85,23 +85,14 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
             ))}
             </tbody>
         </Table>
-        <Row>
+        {!showOptions && <Row>
             <Col xs='auto'>
-                <Button onClick={() => {createNewGame();}}>
+                <Button onClick={() => {setShowOptions(true);}}>
                     Create Game
                 </Button>
             </Col>
-            <Col xs='auto'>
-                <div className="trOptionsDiv">
-                    <div className={validOnly ? "trCheckbox On" : "trCheckbox Off"}
-                    onClick={() => {setValidOnly(!validOnly);}}
-                    data-toggle="tooltip" title="When selected, players get to try again for invalid words"
-                    >
-                        <label key='labelvalidonly'>Mulligans</label>
-                    </div>
-                </div>
-            </Col>
-        </Row>
+        </Row>}
+        {showOptions && <GetClassicOptions submitClassicOptions={createNewGame} cancelClassicOptions={() => {setShowOptions(false)}}/>}
     </div>
     )
 }
