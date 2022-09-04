@@ -1,25 +1,31 @@
 import { useState, useEffect, useRef } from "react";
-import { callApi } from "./callApi";
+import { callSendChat, callGetChat } from "./callApi";
 import { scrollToBottom } from "./scrollToBottom";
 import { usePrevious } from "./usePrevious";
 
-const ShowChat = ({chatnumber, username}) => {
+const ShowChat = ({chattype, chatnumber, username}) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [msgs, setMsgs] = useState([]);
     const [nextmsg, setNextmsg] = useState('');
+    const [lobbychatnumber, setLobbychatnumber] = useState(0);
     const hasFetchedData = useRef(false);
     const prevChatNumber = usePrevious(chatnumber);
+    const prevChatType = usePrevious(chattype);
 
     useEffect(() => {
         async function fetchData() {
-            let jdata = await callApi(`getchat?number=${chatnumber}`);
+            let jdata = await callGetChat(chattype, chatnumber);
             if (jdata.error) {
               setErrorMessage(jdata.error);
             } else {
               setMsgs(jdata.msgs);
+              if (chattype !== 'GAMECHAT') {
+                setLobbychatnumber(jdata.number);
+              }
+              setErrorMessage('');
             }
         }
-        if (!hasFetchedData.current || chatnumber !== prevChatNumber) {
+        if (!hasFetchedData.current || chatnumber !== prevChatNumber || chattype !== prevChatType) {
           fetchData();
           hasFetchedData.current = true;
         }
@@ -28,7 +34,7 @@ const ShowChat = ({chatnumber, username}) => {
         },3000); // every 3 seconds
         return () => clearInterval(timer);
 
-    },[chatnumber,prevChatNumber]);
+    },[chattype,prevChatType,chatnumber,prevChatNumber]);
 
     useEffect(() => {
         scrollToBottom("ScrollableChat");
@@ -37,7 +43,7 @@ const ShowChat = ({chatnumber, username}) => {
     const handleKeyDown = async(event) => {
         if (event.key === "Enter" && nextmsg.length > 0) {
           event.preventDefault();
-          let jdata = await callApi(`chatmessage?number=${chatnumber}&name=${username}&msg=${nextmsg}`);
+          let jdata = await callSendChat(chattype === 'GAMECHAT' ? chatnumber : lobbychatnumber,username,nextmsg);
           if (jdata.msgs) {
               setMsgs(jdata.msgs);
               setNextmsg('');

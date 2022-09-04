@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { callApi } from "./callApi";
+import { callGetTopAnswers, callPickTiles } from "./callApi";
 import ShowFryLetters from "./showFryLetters";
 import Table from "react-bootstrap/Table";
 import Row from "react-bootstrap/Row";
@@ -21,22 +21,21 @@ const PlaySolo = () => {
     },[]);
 
     const pickAllLetters = async () => {
-        let picked = await callApi('pickletters');
+        let picked = await callPickTiles();
         if (picked.error) {
             setWarning(picked.error);
             setAllLetters([]);
             setCurrentLetters([]);
         } else {
             setWarning('');
-            let newPick = Array.from(picked.letters.join('').toUpperCase());
+            let newPick = Array.from(picked.letters.toUpperCase());
             setAllLetters(newPick);
             setCurrentLetters(newPick.slice(0,3));    
         }
     };
 
     async function getTopAnswers() {
-        let route = `gettopanswers?letters=${currentLetters.join('')}&count=10`;
-        let tops = await callApi(route);
+        let tops = await callGetTopAnswers(currentLetters.join(''), 10);
         if (tops.error) {
             setWarning(tops.error);
             return 'urp';

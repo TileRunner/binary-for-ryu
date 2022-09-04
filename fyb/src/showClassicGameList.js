@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-import { callApi } from "./callApi";
+import { callGetGameList, callCreateGame, callJoinGame } from "./callApi";
 import { formatTime } from "./formatTime";
 import GetClassicOptions from "./getClassicOptions";
 
@@ -14,12 +14,12 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
     const [showOptions, setShowOptions] = useState(false);
     useEffect(() => {
         async function fetchData() {
-            let jdata = await callApi(`listgames?type=CLASSIC`);
+            let jdata = await callGetGameList('CLASSIC');
             if (jdata.error) {
                 setErrorMessage(jdata.error);
             } else {
-                if (JSON.stringify(jdata) !== JSON.stringify(gamelist)) {
-                    setGamelist(jdata);
+                if (JSON.stringify(jdata.gamelist) !== JSON.stringify(gamelist)) {
+                    setGamelist(jdata.gamelist);
                 }
                 setErrorMessage('');
             }
@@ -34,23 +34,25 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
         return () => clearInterval(timer);
     });
     async function createNewGame(options) {
-        let jdata = await callApi(`creategame?type=CLASSIC&name=${username}&validOnly=${options.mulligans}&timeLimit=${options.timeLimit}`);
+        let jdata = await callCreateGame('CLASSIC', username, options.mulligans, options.timeLimit);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
             setGamenumber(jdata.number);
             setGamechatnumber(jdata.chatNumber);
             setInlobby(false);
+            setErrorMessage('');
         }
     }
     async function joinGame(joingamenumber) {
-        let jdata = await callApi(`joingame?number=${joingamenumber}&name=${username}`);
+        let jdata = await callJoinGame(joingamenumber,username);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
             setGamenumber(jdata.number);
             setGamechatnumber(jdata.chatNumber);
             setInlobby(false);
+            setErrorMessage('');
         }
     }
     return (<div>

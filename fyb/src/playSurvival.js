@@ -21,7 +21,7 @@ const PlaySurvival = ({username}) => {
                 <tbody>
                     <tr>
                         <td><ShowSurvivalGameList username={username} setInlobby={setInlobby} setGamenumber={setGamenumber} setGamechatnumber={setGamechatnumber}/></td>
-                        <td><ShowChat chatnumber={2} username={username}/></td>
+                        <td><ShowChat chattype='SURVIVAL' username={username}/></td>
                     </tr>
                 </tbody>
             </Table>
@@ -36,7 +36,7 @@ const PlaySurvival = ({username}) => {
                 <tbody>
                     <tr>
                         <td><ShowSurvivalGame gamenumber={gamenumber} username={username}/></td>
-                        <td><ShowChat chatnumber={gamechatnumber} username={username}/></td>
+                        <td><ShowChat chattype='GAMECHAT' chatnumber={gamechatnumber} username={username}/></td>
                     </tr>
                 </tbody>
             </Table>

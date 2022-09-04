@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import InputWord from "./inputWord";
-import { callApi } from "./callApi";
+import { callStartGame, callMakeMove, callPlayAgain, callGetGame } from "./callApi";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -8,17 +8,14 @@ import Table from 'react-bootstrap/Table';
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import ShowFryLetters from "./showFryLetters";
-import { usePrevious } from "./usePrevious";
 
 const ShowClassicGame = ({gamenumber, username}) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [gamedata, setGamedata] = useState({});
     const [myword, setMyword] = useState('');
-    const [topAnswers, setTopAnswers] = useState([]);
     const hasFetchedData = useRef(false);
-    const prevGamedata = usePrevious(gamedata);
     async function startGame() {
-        let jdata = await callApi(`startgame?number=${gamenumber}`);
+        let jdata = await callStartGame(gamenumber);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
@@ -36,17 +33,17 @@ const ShowClassicGame = ({gamenumber, username}) => {
         }
     }
     async function handleSubmit(myword, valid, timedout) {
-        let route = `makemove?number=${gamenumber}&name=${username}`;
+        let type = '';
         if (timedout) {
-            route = `${route}&type=TIMEOUT`;
+            type = 'TIMEOUT';
         } else if (!myword) {
-            route = `${route}&type=PASS`
+            type = 'PASS';
         } else if (valid) {
-            route = `${route}&type=VALID&word=${myword}`;
+            type = 'VALID';
         } else {
-            route = `${route}&type=PHONY&word=${myword}`;
+            type = 'PHONY';
         }   
-        let jdata = await callApi(route);
+        let jdata = await callMakeMove(gamenumber, username, type, myword);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
@@ -55,7 +52,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
         }
     }
     async function playAgain() {
-        let jdata = await callApi(`playagain?number=${gamenumber}`);
+        let jdata = await callPlayAgain(gamenumber);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
@@ -87,7 +84,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
     useEffect(() => {
         async function fetchData() {
             // If I call refreshGamedata, which has this same code, compiler complains about refreshGamedata not being a dependancy
-            let jdata = await callApi(`getgame?number=${gamenumber}`);
+            let jdata = await callGetGame(gamenumber);
             if (jdata.error) {
                 setErrorMessage(jdata.error);
             } else if (JSON.stringify(jdata) !== JSON.stringify(gamedata)) {
@@ -104,21 +101,6 @@ const ShowClassicGame = ({gamenumber, username}) => {
           },3000); // every 3 seconds
         return () => clearInterval(timer);
     });
-    useEffect(() => {
-        async function fetchTopAnswers() {
-            let route = `gettopanswers?letters=${gamedata.rounds[gamedata.rounds.length-1].letters.join('')}&count=10`;
-            let tops = await callApi(route);
-            if (tops.error) {
-                setErrorMessage(tops.error);
-                setTopAnswers(['urp']);
-            } else {
-                setTopAnswers(tops.answers);
-            }
-        }
-        if ((!prevGamedata || !prevGamedata.finished) && gamedata.finished) {
-            fetchTopAnswers();
-        }
-    },[gamedata, prevGamedata]);
     return (<div>
         {errorMessage && <Alert variant="warning">Error: {errorMessage}</Alert>}
         {gamedata.started && <Row>
@@ -194,7 +176,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
             </Row>}
             <Row>
                 <Col xs='auto'>
-                    <Alert variant='info'>Top 10: {topAnswers.join(", ")}</Alert>
+                    <Alert variant='info'>Top 10: {gamedata.rounds[gamedata.rounds.length-1].topAnswers.join(", ")}</Alert>
                 </Col>
             </Row>
         </Container> }

@@ -21,7 +21,7 @@ const PlayClassic = ({username}) => {
                 <tbody>
                     <tr>
                         <td><ShowClassicGameList username={username} setInlobby={setInlobby} setGamenumber={setGamenumber} setGamechatnumber={setGamechatnumber}/></td>
-                        <td><ShowChat chatnumber={1} username={username}/></td>
+                        <td><ShowChat chattype='CLASSIC' username={username}/></td>
                     </tr>
                 </tbody>
             </Table>
@@ -36,7 +36,7 @@ const PlayClassic = ({username}) => {
                 <tbody>
                     <tr>
                         <td><ShowClassicGame gamenumber={gamenumber} username={username}/></td>
-                        <td><ShowChat chatnumber={gamechatnumber} username={username}/></td>
+                        <td><ShowChat chattype='GAMECHAT' chatnumber={gamechatnumber} username={username}/></td>
                     </tr>
                 </tbody>
             </Table>
