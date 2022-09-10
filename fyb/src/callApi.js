@@ -8,7 +8,7 @@ const baseurl = (process.env.NODE_ENV === 'production' ? 'https://webappscrabble
  * @async
  */
 export async function callGetChat(chattype, chatnumber) {
-    let url = chattype === 'GAMECHAT' ? `${baseurl}/fyb/getchat?number=${chatnumber}` : `${baseurl}/fyb/getlobbychat?type=${chattype}`;
+    let url = chattype === 'GAMECHAT' ? `${baseurl}/chat/getchat?number=${chatnumber}` : `${baseurl}/fyb/getlobbychat?type=${chattype}`;
     try {
         const response = await fetch(url);
         const jdata = await response.json();
@@ -28,7 +28,7 @@ export async function callGetChat(chattype, chatnumber) {
  * @async
  */
  export async function callSendChat(number, name, msg) {
-    let url = `${baseurl}/fyb/chatmessage?number=${number}&name=${name}&msg=${msg}`;
+    let url = `${baseurl}/chat/chatmessage?number=${number}&name=${name}&msg=${msg}`;
     try {
         const response = await fetch(url);
         const jdata = await response.json();
