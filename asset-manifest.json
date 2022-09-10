@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/binary-for-ryu/static/css/main.1d1c28c4.css",
-    "main.js": "/binary-for-ryu/static/js/main.7d4ca97e.js",
+    "main.js": "/binary-for-ryu/static/js/main.38e39a9c.js",
     "static/media/tileCS.ico": "/binary-for-ryu/static/media/tileCS.b97c736bc3dad5ed5091.ico",
     "index.html": "/binary-for-ryu/index.html",
     "main.1d1c28c4.css.map": "/binary-for-ryu/static/css/main.1d1c28c4.css.map",
-    "main.7d4ca97e.js.map": "/binary-for-ryu/static/js/main.7d4ca97e.js.map"
+    "main.38e39a9c.js.map": "/binary-for-ryu/static/js/main.38e39a9c.js.map"
   },
   "entrypoints": [
     "static/css/main.1d1c28c4.css",
-    "static/js/main.7d4ca97e.js"
+    "static/js/main.38e39a9c.js"
   ]
 }
