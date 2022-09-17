@@ -8,7 +8,7 @@ const baseurl = (process.env.NODE_ENV === 'production' ? 'https://webappscrabble
  * @async
  */
 export async function callGetChat(chattype, chatnumber) {
-    let url = chattype === 'GAMECHAT' ? `${baseurl}/chat/getchat?number=${chatnumber}` : `${baseurl}/fyb/getlobbychat?type=${chattype}`;
+    let url = chattype === 'GAMECHAT' ? `${baseurl}/chat/getchat?number=${chatnumber}` : `${baseurl}/chat/getlobbychat?type=${chattype}`;
     try {
         const response = await fetch(url);
         const jdata = await response.json();
