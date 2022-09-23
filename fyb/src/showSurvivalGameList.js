@@ -18,8 +18,8 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
             if (jdata.error) {
                 setErrorMessage(jdata.error);
             } else {
-                if (JSON.stringify(jdata.gamelist) !== JSON.stringify(gamelist)) {
-                    setGamelist(jdata.gamelist);
+                if (JSON.stringify(jdata) !== JSON.stringify(gamelist)) {
+                    setGamelist(jdata);
                 }
                 setErrorMessage('');
             }

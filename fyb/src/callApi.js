@@ -1,5 +1,18 @@
 const baseurl = (process.env.NODE_ENV === 'production' ? 'https://webappscrabbleclub.azurewebsites.net/api/Values' : 'https://localhost:55557/api/Values');
 
+async function typicalCall(url) {
+    let responseText = "";
+    try {
+        let response = await fetch(url);
+        responseText = await response.text();
+        const jdata = JSON.parse(responseText);
+        jdata.value.error = false;
+        return jdata.value;
+    } catch (error) {
+        return {error: responseText};
+    }
+}
+
 /**
  * Get chat messages
  * @param {string} chattype GAMECHAT (game), CLASSIC (lobby), or SURVIVAL (lobby)
@@ -9,15 +22,8 @@ const baseurl = (process.env.NODE_ENV === 'production' ? 'https://webappscrabble
  */
 export async function callGetChat(chattype, chatnumber) {
     let url = chattype === 'GAMECHAT' ? `${baseurl}/chat/getchat?number=${chatnumber}` : `${baseurl}/chat/getlobbychat?type=${chattype}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Send chat message, get back updated chat data
@@ -29,15 +35,8 @@ export async function callGetChat(chattype, chatnumber) {
  */
  export async function callSendChat(number, name, msg) {
     let url = `${baseurl}/chat/chatmessage?number=${number}&name=${name}&msg=${msg}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Pick tiles for a game
@@ -46,14 +45,8 @@ export async function callGetChat(chattype, chatnumber) {
  */
 export async function callPickTiles() {
     let url = `${baseurl}/ENABLE2K/fybpick?guarantee=6`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        return {letters: jdata.value, error: false};
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Determine whether a word is in the slur-expunged ENABLE2K lexicon, case insensitive
@@ -63,9 +56,8 @@ export async function callPickTiles() {
  */
  export async function isWordValid(word) {
     let url = `${baseurl}/ENABLE2K/exists?word=${word}`; // Server handles case insensitive logic
-    const response = await fetch(url);
-    const jdata = await response.json();
-    return jdata.value;
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Get the top given number of answers for the given letters
@@ -76,14 +68,8 @@ export async function callPickTiles() {
  */
 export async function callGetTopAnswers(letters, numWanted) {
     let url = `${baseurl}/ENABLE2K/fybtopanswers?letters=${letters}&numWanted=${numWanted}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        return {answers: jdata.value, error: false};
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Start the game
@@ -93,15 +79,8 @@ export async function callGetTopAnswers(letters, numWanted) {
  */
 export async function callStartGame(number) {
     let url =`${baseurl}/fyb/startgame?number=${number}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Send a player move and get back updated game data
@@ -113,15 +92,8 @@ export async function callStartGame(number) {
  */
 export async function callMakeMove(number, name, type, word) {
     let url =`${baseurl}/fyb/makemove?number=${number}&name=${name}&type=${type}&word=${word}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Tell server you want to play again, get back updated game data
@@ -131,15 +103,8 @@ export async function callMakeMove(number, name, type, word) {
  */
  export async function callPlayAgain(number) {
     let url =`${baseurl}/fyb/playagain?number=${number}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Get game data
@@ -149,15 +114,8 @@ export async function callMakeMove(number, name, type, word) {
  */
  export async function callGetGame(number) {
     let url =`${baseurl}/fyb/getgame?number=${number}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Get game list
@@ -167,14 +125,8 @@ export async function callMakeMove(number, name, type, word) {
  */
  export async function callGetGameList(type) {
     let url =`${baseurl}/fyb/listgames?type=${type}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        return {gamelist: jdata.value, error: false};
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Create new game
@@ -187,15 +139,8 @@ export async function callMakeMove(number, name, type, word) {
  */
 export async function callCreateGame(type, name, validOnly, timeLimit) {
     let url = `${baseurl}/fyb/creategame?type=${type}&name=${name}&validOnly=${validOnly}&timeLimit=${timeLimit}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
 }
 /**
  * Join game
@@ -206,13 +151,17 @@ export async function callCreateGame(type, name, validOnly, timeLimit) {
  */
  export async function callJoinGame(number, name) {
     let url =`${baseurl}/fyb/joingame?number=${number}&name=${name}`;
-    try {
-        const response = await fetch(url);
-        const jdata = await response.json();
-        jdata.value.error = false;
-        return jdata.value;
-    } catch (error) {
-        console.log(error);
-        return {error: 'Problem with ' + url};
-    }
+    let response = await typicalCall(url);
+    return response;
+}
+/**
+ * Delete the game
+ * @param {int} number The game number
+ * @returns The updated game list
+ * @async
+ */
+ export async function callDeleteGame(number) {
+    let url =`${baseurl}/fyb/deletegame?number=${number}`;
+    let response = await typicalCall(url);
+    return response;
 }

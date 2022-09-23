@@ -40,7 +40,7 @@ const PlaySolo = () => {
             setWarning(tops.error);
             return 'urp';
         }
-        return tops.answers.join(', ');
+        return tops.join(', ');
     }
 
     async function submitPlayerWord (word, valid) {

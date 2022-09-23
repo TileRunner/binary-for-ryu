@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-import { callGetGameList, callCreateGame, callJoinGame } from "./callApi";
+import { callGetGameList, callCreateGame, callJoinGame, callDeleteGame } from "./callApi";
 import { formatTime } from "./formatTime";
 import GetClassicOptions from "./getClassicOptions";
 
@@ -18,8 +18,8 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
             if (jdata.error) {
                 setErrorMessage(jdata.error);
             } else {
-                if (JSON.stringify(jdata.gamelist) !== JSON.stringify(gamelist)) {
-                    setGamelist(jdata.gamelist);
+                if (JSON.stringify(jdata) !== JSON.stringify(gamelist)) {
+                    setGamelist(jdata);
                 }
                 setErrorMessage('');
             }
@@ -55,6 +55,15 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
             setErrorMessage('');
         }
     }
+    async function deleteGame(deletegamenumber) {
+        let jdata = await callDeleteGame(deletegamenumber)
+        if (jdata.error) {
+            setErrorMessage(jdata.error);
+        } else {
+            setGamelist(jdata);
+            setErrorMessage('');
+        }
+    }
     return (<div>
         {errorMessage && <p className="trWarning">Error: {errorMessage}</p>}
         <p>Number of games: {gamelist.length}</p>
@@ -78,10 +87,22 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
                     <td>{game.numPlayers}</td>
                     <td>{game.finished ? 'Finished' : game.started ? 'In Progress' : 'Not Started'}</td>
                     <td>
-                        <Button key={`joinbutton${game.number}`}
-                        onClick={() => {joinGame(game.number);}}>
-                            Join
-                        </Button>
+                        <Row key={`actionbuttons${game.number}`}>
+                            <Col xs='auto'>
+                                <Button
+                                variant="primary"
+                                onClick={() => {joinGame(game.number);}}>
+                                    Join
+                                </Button>
+                            </Col>
+                            {game.finished && <Col xs='auto'>
+                                <Button
+                                variant="danger"
+                                onClick={() => {deleteGame(game.number);}}>
+                                    Delete
+                                </Button>
+                            </Col>}
+                        </Row>
                     </td>
                 </tr>
             ))}
