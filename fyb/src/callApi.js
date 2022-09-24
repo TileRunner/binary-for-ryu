@@ -45,8 +45,14 @@ export async function callGetChat(chattype, chatnumber) {
  */
 export async function callPickTiles() {
     let url = `${baseurl}/ENABLE2K/fybpick?guarantee=6`;
-    let response = await typicalCall(url);
-    return response;
+    try {
+        const response = await fetch(url);
+        const jdata = await response.json();
+        return {letters: jdata.value, error: false};
+    } catch (error) {
+        console.log(error);
+        return {error: 'Problem with ' + url};
+    }
 }
 /**
  * Determine whether a word is in the slur-expunged ENABLE2K lexicon, case insensitive
