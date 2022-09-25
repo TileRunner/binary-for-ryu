@@ -157,6 +157,7 @@ const ShowClassicGame = ({gamenumber, username}) => {
                                 setMyword={setMyword}
                                 mulligans={gamedata.validOnly}
                                 timeLimit={gamedata.timeLimit}
+                                numSeconds={gamedata.numSeconds}
                                 />
             </Col>
         </Row>}

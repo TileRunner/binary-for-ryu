@@ -34,7 +34,7 @@ const ShowClassicGameList = ({username, setInlobby, setGamenumber, setGamechatnu
         return () => clearInterval(timer);
     });
     async function createNewGame(options) {
-        let jdata = await callCreateGame('CLASSIC', username, options.mulligans, options.timeLimit);
+        let jdata = await callCreateGame('CLASSIC', username, options.mulligans, options.timeLimit, options.numSeconds);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {

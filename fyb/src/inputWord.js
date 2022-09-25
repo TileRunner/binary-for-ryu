@@ -7,7 +7,7 @@ import { usePrevious } from './usePrevious';
 import { useEffect, useState } from 'react';
 import { isWordValid } from "./callApi";
 import Alert from 'react-bootstrap/Alert';
-const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mulligans, timeLimit}) => {
+const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mulligans, timeLimit, numSeconds}) => {
     const prevLetters = usePrevious(letters);
     const [showHelp, setShowHelp] = useState(false);
     const handleShowHelp = () => setShowHelp(true);
@@ -15,15 +15,15 @@ const InputWord = ({handleSubmit, letters, myprevword, myword, setMyword, mullig
     const [errorMessage, setErrorMessage] = useState('');
     const handleClearErrorMessage = () => setErrorMessage('');
     const [timeStart, setTimeStart] = useState(0);
-    const [timeRemaining, setTimeRemaining] = useState(60);
+    const [timeRemaining, setTimeRemaining] = useState(numSeconds);
 
     useEffect(() => {
         const timer = setInterval(() => {
-            let secsLeft = Math.round((60000 - Date.now() + timeStart) / 1000);
+            let secsLeft = Math.round(((numSeconds * 1000) - Date.now() + timeStart) / 1000);
             setTimeRemaining( secsLeft < 0 ? 0 : secsLeft);
           },1000); // every second
         return () => clearInterval(timer);
-    },[timeStart]);
+    },[timeStart, numSeconds]);
     useEffect(() => {
         if (JSON.stringify(letters) !== JSON.stringify(prevLetters)) {
             setMyword('');

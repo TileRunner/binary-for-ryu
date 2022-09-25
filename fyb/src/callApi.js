@@ -140,11 +140,12 @@ export async function callMakeMove(number, name, type, word) {
  * @param {string}  name Player name
  * @param {boolean} validOnly   Whether to allow mulligans
  * @param {boolean} timeLimit   Whether time limit applies
+ * @param {int}     numSeconds  Number of seconds per move
  * @returns Game data or an error, json format
  * @async
  */
-export async function callCreateGame(type, name, validOnly, timeLimit) {
-    let url = `${baseurl}/fyb/creategame?type=${type}&name=${name}&validOnly=${validOnly}&timeLimit=${timeLimit}`;
+export async function callCreateGame(type, name, validOnly, timeLimit, numSeconds) {
+    let url = `${baseurl}/fyb/creategame?type=${type}&name=${name}&validOnly=${validOnly}&timeLimit=${timeLimit}&numSeconds=${numSeconds}`;
     let response = await typicalCall(url);
     return response;
 }

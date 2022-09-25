@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-import { callGetGameList, callCreateGame, callJoinGame } from "./callApi";
+import { callGetGameList, callCreateGame, callJoinGame, callDeleteGame } from "./callApi";
 import { formatTime } from "./formatTime";
 import GetSurvivalOptions from "./getSurvivalOptions";
 
@@ -34,7 +34,7 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
         return () => clearInterval(timer);
     });
     async function createNewGame(options) {
-        let jdata = await callCreateGame('SURVIVAL', username, options.mulligans, options.timeLimit);
+        let jdata = await callCreateGame('SURVIVAL', username, options.mulligans, options.timeLimit, options.numSeconds);
         if (jdata.error) {
             setErrorMessage(jdata.error);
         } else {
@@ -52,6 +52,15 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
             setGamenumber(jdata.number);
             setGamechatnumber(jdata.chatNumber);
             setInlobby(false);
+            setErrorMessage('');
+        }
+    }
+    async function deleteGame(deletegamenumber) {
+        let jdata = await callDeleteGame(deletegamenumber)
+        if (jdata.error) {
+            setErrorMessage(jdata.error);
+        } else {
+            setGamelist(jdata);
             setErrorMessage('');
         }
     }
@@ -78,10 +87,22 @@ const ShowSurvivalGameList = ({username, setInlobby, setGamenumber, setGamechatn
                     <td>{game.numPlayers}</td>
                     <td>{game.finished ? 'Finished' : game.started ? 'In Progress' : 'Not Started'}</td>
                     <td>
-                        <Button key={`joinbutton${game.number}`}
-                        onClick={() => {joinGame(game.number);}}>
-                            Join
-                        </Button>
+                        <Row key={`actionbuttons${game.number}`}>
+                            <Col xs='auto'>
+                                <Button
+                                variant="primary"
+                                onClick={() => {joinGame(game.number);}}>
+                                    Join
+                                </Button>
+                            </Col>
+                            {game.finished && <Col xs='auto'>
+                                <Button
+                                variant="danger"
+                                onClick={() => {deleteGame(game.number);}}>
+                                    Delete
+                                </Button>
+                            </Col>}
+                        </Row>
                     </td>
                 </tr>
             ))}

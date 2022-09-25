@@ -137,6 +137,7 @@ const PlaySolo = () => {
                                 setMyword={setMyword}
                                 mulligans={mulligans}
                                 timeLimit={false}
+                                numSeconds={60}
                 /></Col>
             </Row>}
             {warning && <div className="trWarning">{warning}</div>}
