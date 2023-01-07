@@ -1,4 +1,5 @@
 const baseurl = (process.env.NODE_ENV === 'production' ? 'https://webappscrabbleclub.azurewebsites.net/api/Values' : 'https://localhost:55557/api/Values');
+//const baseurl = 'https://webappscrabbleclub.azurewebsites.net/api/Values';
 
 async function typicalCall(url) {
     let responseText = "";
@@ -9,6 +10,22 @@ async function typicalCall(url) {
         jdata.value.error = false;
         return jdata.value;
     } catch (error) {
+        console.log(url);
+        console.log(responseText);
+        return {error: responseText};
+    }
+}
+
+async function binaryResultCall(url) {
+    let responseText = "";
+    try {
+        let response = await fetch(url);
+        responseText = await response.text();
+        const jdata = JSON.parse(responseText);
+        return jdata.value;
+    } catch (error) {
+        console.log(url);
+        console.log(responseText);
         return {error: responseText};
     }
 }
@@ -62,7 +79,7 @@ export async function callPickTiles() {
  */
  export async function isWordValid(word) {
     let url = `${baseurl}/ENABLE2K/exists?word=${word}`; // Server handles case insensitive logic
-    let response = await typicalCall(url);
+    let response = await binaryResultCall(url);
     return response;
 }
 /**
