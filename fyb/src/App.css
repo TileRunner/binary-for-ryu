@@ -454,3 +454,9 @@
   font-style: italic;
   margin-left: 5px;
 }
+.ackNASPA {
+  padding: 5px;
+  background-color:aqua;
+  color: #200FA0;
+  width: fit-content;
+}

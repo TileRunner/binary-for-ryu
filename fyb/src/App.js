@@ -31,6 +31,11 @@ function App() {
            gameMode={gameMode}
            setGameMode={setGameMode}
           />
+          {gameMode === 'UNK' && <div className='ackNASPA'>
+            <a href="http://www.scrabbleplayers.org"><img border="0" src="http://www.scrabbleplayers.org/pix/logo-only-160px.png" alt="[NASPA Logo]"/></a>
+            <p>NWL20 lexicon used with permission from NASPA</p>
+            <p>ENABLE2K lexicon used for words longer than 15 letters</p>
+          </div>}
           {gameMode === 'SOLO' && <PlaySolo
           />}
           {loggedIn && gameMode === 'CLASSIC' && <PlayClassic

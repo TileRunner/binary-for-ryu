@@ -61,7 +61,7 @@ export async function callGetChat(chattype, chatnumber) {
  * @async
  */
 export async function callPickTiles() {
-    let url = `${baseurl}/ENABLE2K/fybpick?guarantee=6`;
+    let url = `${baseurl}/NWL2020/fybpick?guarantee=6`;
     try {
         const response = await fetch(url);
         const jdata = await response.json();
@@ -72,13 +72,13 @@ export async function callPickTiles() {
     }
 }
 /**
- * Determine whether a word is in the slur-expunged ENABLE2K lexicon, case insensitive
+ * Determine whether a word exists, case insensitive
  * @param {string} word A word
  * @returns Whether the word is in the lexicon
  * @async
  */
  export async function isWordValid(word) {
-    let url = `${baseurl}/ENABLE2K/exists?word=${word}`; // Server handles case insensitive logic
+    let url = `${baseurl}/ENABLE2K/NWL2020/exists?word=${word}`; // Server handles case insensitive logic
     let response = await binaryResultCall(url);
     return response;
 }
@@ -90,7 +90,7 @@ export async function callPickTiles() {
  * @async
  */
 export async function callGetTopAnswers(letters, numWanted) {
-    let url = `${baseurl}/ENABLE2K/fybtopanswers?letters=${letters}&numWanted=${numWanted}`;
+    let url = `${baseurl}/NWL2020/fybtopanswers?letters=${letters}&numWanted=${numWanted}`;
     let response = await typicalCall(url);
     return response;
 }
@@ -101,7 +101,7 @@ export async function callGetTopAnswers(letters, numWanted) {
  * @async
  */
 export async function callStartGame(number) {
-    let url =`${baseurl}/fyb/startgame?number=${number}`;
+    let url =`${baseurl}/NWL2020/fyb/startgame?number=${number}`;
     let response = await typicalCall(url);
     return response;
 }
@@ -114,7 +114,7 @@ export async function callStartGame(number) {
  * @returns The updated game data or an error
  */
 export async function callMakeMove(number, name, type, word) {
-    let url =`${baseurl}/fyb/makemove?number=${number}&name=${name}&type=${type}&word=${word}`;
+    let url =`${baseurl}/NWL2020/fyb/makemove?number=${number}&name=${name}&type=${type}&word=${word}`;
     let response = await typicalCall(url);
     return response;
 }
